@@ -28,7 +28,7 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title>CRAMPS YZ Harness</dc:title><cc:license
            rdf:resource="http://creativecommons.org/licenses/by-sa/4.0/" /><dc:date>2016-03</dc:date><dc:creator><cc:Agent><dc:title>Dovetail Automata LLC</dc:title></cc:Agent></dc:creator><dc:contributor><cc:Agent><dc:title>- Original document by Aleph Objects, Inc.
 - Modifications by John Morris, Dovetail Automata LLC
-</dc:title></cc:Agent></dc:contributor><dc:rights><cc:Agent><dc:title>Aleph Objects, Inc.</dc:title></cc:Agent></dc:rights><dc:relation></dc:relation><dc:subject><rdf:Bag><rdf:li>Lulzbot</rdf:li><rdf:li>TAZ-5</rdf:li><rdf:li>CRAMPS</rdf:li><rdf:li>BeagleBone</rdf:li></rdf:Bag></dc:subject><dc:description>TAZ-5 control box YZ harness modified for a BeagleBone and CRAMPS controller retrofit.  Original document from http://devel.lulzbot.com/TAZ/Guava/production_parts/Electronics/CTRL%20BOX%20-%20Internal%20Harnesses/Harnesses/CB_%20YZ%20Harness%203.0.odg</dc:description></cc:Work><cc:License
+</dc:title></cc:Agent></dc:contributor><dc:rights><cc:Agent><dc:title>Aleph Objects, Inc.</dc:title></cc:Agent></dc:rights><dc:relation /><dc:subject><rdf:Bag><rdf:li>Lulzbot</rdf:li><rdf:li>TAZ-5</rdf:li><rdf:li>CRAMPS</rdf:li><rdf:li>BeagleBone</rdf:li></rdf:Bag></dc:subject><dc:description>TAZ-5 control box YZ harness modified for a BeagleBone and CRAMPS controller retrofit.  Original document from http://devel.lulzbot.com/TAZ/Guava/production_parts/Electronics/CTRL%20BOX%20-%20Internal%20Harnesses/Harnesses/CB_%20YZ%20Harness%203.0.odg</dc:description></cc:Work><cc:License
          rdf:about="http://creativecommons.org/licenses/by-sa/3.0/"><cc:permits
            rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
            rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:requires
@@ -49,8 +49,8 @@
      id="namedview7201"
      showgrid="false"
      inkscape:zoom="0.76544801"
-     inkscape:cx="512.78963"
-     inkscape:cy="468.80141"
+     inkscape:cx="439.01306"
+     inkscape:cy="413.46978"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -3819,7 +3819,105 @@
        id="path17757"
        d="m 420.28424,363.75952 c -1.16828,0.33671 0.065,-0.007 -1.13802,0.2927 -0.0495,0.0124 0.19862,-0.0438 0.15115,-0.025 -0.62628,0.24833 -0.30878,0.1037 -0.12263,0.047 -0.67542,0.28812 -0.73878,0.4004 -1.35984,0.84336 -0.76321,0.53679 -1.03027,0.77224 -1.48202,1.14025 0.0693,-0.0551 0.27175,-0.22662 0.20802,-0.16516 -0.60937,0.58752 -0.56674,0.47662 -0.236,0.21341 0.0113,-0.009 -0.0157,0.0244 -0.0251,0.0354 -0.0619,0.0721 -0.13045,0.13873 -0.18873,0.21384 -0.0368,0.0474 0.0827,-0.087 0.12405,-0.13049 -0.59666,0.73443 -1.18171,1.47661 -1.76729,2.21981 -0.32017,0.49445 -0.70005,0.97079 -1.06374,1.4343 -0.1939,0.24712 -0.26239,0.29589 -0.14196,0.20074 -0.52714,0.65646 -0.707,1.0339 -1.13857,1.73199 -0.39996,0.5218 -0.54093,1.001 -0.74422,1.60872 -0.42678,1.49805 -0.74512,3.0243 -1.06947,4.5471 -0.37443,1.8106 -0.60957,3.64422 -0.8352,5.47804 -0.25147,1.5849 -0.22808,3.17115 -0.15791,4.7662 0.0107,0.98926 0.27961,1.88477 0.61227,2.79864 0.17957,0.60413 0.41043,1.12097 0.74616,1.57393 0.0365,0.0493 -0.0551,-0.10964 -0.0827,-0.16445 0.44784,0.56321 0.65255,0.7078 1.25471,1.37005 0.70494,0.73888 1.53252,1.36484 2.32378,2.01203 1.59664,1.28592 3.26199,2.48315 4.9712,3.61457 2.00173,1.44321 4.12744,2.69599 6.24785,3.9533 2.37129,1.40632 4.88757,2.54688 7.38763,3.70118 2.71171,1.2771 5.4642,2.45943 8.24462,3.57744 2.91307,1.07703 5.76804,2.30224 8.61768,3.53527 3.27358,1.44708 6.57594,2.82651 9.85644,4.25765 3.44631,1.46506 6.80768,3.11892 10.18794,4.72802 3.10833,1.54476 6.26826,2.98131 9.40278,4.47135 2.64262,1.21491 5.26302,2.47693 7.85793,3.79054 1.88243,0.96552 3.78315,1.88381 5.74372,2.67947 2.12409,0.84432 4.27946,1.60501 6.42887,2.38174 1.97252,0.71315 3.92549,1.47572 5.90411,2.17227 1.83632,0.6505 3.70711,1.19622 5.56573,1.77784 1.96844,0.61311 3.95123,1.17315 5.90043,1.84596 1.07309,0.25831 2.08849,0.75232 3.16465,0.9918 0.59525,-0.005 1.1841,0.18569 1.76231,0.31535 0.59328,0.0299 1.17346,0.18859 1.75436,0.3046 0.58426,0.0635 1.15443,0.21214 1.71974,0.36828 0,0 -3.26285,11.5479 -3.26285,11.5479 l 0,0 c -0.0372,-0.0115 -0.15041,-0.0369 -0.11156,-0.0345 0.11921,0.007 0.47314,0.0663 0.35486,0.0497 -0.73993,-0.10381 -0.37055,-0.0452 -1.09011,-0.17176 -0.82215,-0.16869 -0.80409,-0.15164 -2.03548,-0.36525 -0.12535,-0.0289 -0.251,-0.0565 -0.37605,-0.0866 -0.0279,-0.007 -0.11121,-0.0251 -0.0826,-0.0239 0.10953,0.004 0.436,0.0467 0.32714,0.0337 -0.68264,-0.0813 -1.36729,-0.15387 -2.03278,-0.3376 -1.35319,-0.37131 -2.67071,-0.85776 -4.01738,-1.25197 -1.83534,-0.63775 -3.71009,-1.14646 -5.56176,-1.73432 -1.99238,-0.62481 -3.99821,-1.2098 -5.96586,-1.91093 -2.00891,-0.70813 -3.99382,-1.47772 -5.99566,-2.20494 -2.30106,-0.83172 -4.60788,-1.64834 -6.88071,-2.55542 -2.26026,-0.9249 -4.46312,-1.9681 -6.63448,-3.08579 -2.50552,-1.26928 -5.03736,-2.48502 -7.58914,-3.65862 -3.13608,-1.49124 -6.29804,-2.92804 -9.40801,-4.47383 -3.26139,-1.55252 -6.5035,-3.1507 -9.82864,-4.56418 -3.27017,-1.42673 -6.56227,-2.80163 -9.82556,-4.24423 -2.75304,-1.1926 -5.51202,-2.37482 -8.32739,-3.41409 -2.96669,-1.19318 -5.90352,-2.45555 -8.79782,-3.81621 -2.8729,-1.32661 -5.75591,-2.65254 -8.47772,-4.27412 -2.30032,-1.3641 -4.60374,-2.72853 -6.77959,-4.28772 -2.03107,-1.35895 -4.02286,-2.77688 -5.92128,-4.31732 -1.24764,-1.02256 -2.52203,-2.0307 -3.60649,-3.23095 -0.60248,-0.66523 -1.25983,-1.2906 -1.80016,-2.01517 -1.08101,-1.46833 -1.99786,-3.03865 -2.53439,-4.79553 -0.72172,-2.04484 -1.22182,-4.13666 -1.2996,-6.31457 -0.0964,-2.26054 -0.0876,-4.51812 0.23815,-6.76345 0.27233,-2.17706 0.5558,-4.35411 1.00779,-6.50276 0.4299,-2.01273 0.85051,-4.03246 1.47497,-5.99598 0.51532,-1.4498 1.08969,-2.88601 1.98412,-4.15108 0.34471,-0.58588 0.80067,-1.37372 1.29369,-1.96689 0.63746,-0.90261 1.08126,-1.41567 1.73367,-2.35528 0.517,-0.65073 1.02036,-1.31303 1.551,-1.95295 0.009,-0.0103 -0.0109,0.0245 -0.0163,0.0367 0.7277,-0.93027 1.45495,-1.73527 2.26723,-2.39575 0.70938,-0.45873 1.30088,-1.11384 2.02937,-1.55253 0.9618,-0.68006 1.93019,-1.35871 3.01664,-1.82888 0.91049,-0.41623 1.79261,-0.73116 2.75746,-0.98585 0.0539,-0.0142 -0.51957,0.20868 -0.1562,0.0597 0,0 3.79473,11.3842 3.79473,11.3842 z"
        inkscape:connector-curvature="0"
-       transform="scale(28.222222,28.222222)" /></g><g
+       transform="scale(28.222222,28.222222)" /><g
+       transform="translate(-10927.532,-7903.0807)"
+       style="display:inline"
+       class="com.sun.star.drawing.TextShape"
+       id="g6557-5"><g
+         id="id40-2"><text
+           class="TextShape"
+           id="text6560-1"><tspan
+             class="TextParagraph"
+             font-size="388px"
+             font-weight="400"
+             id="tspan6562-6"
+             style="font-size:388px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
+               class="TextPosition"
+               x="15105"
+               y="12386"
+               id="tspan6564-5"><tspan
+                 id="tspan6566-0"
+                 style="fill:#000000;stroke:none">L1=</tspan><tspan
+                 font-weight="700"
+                 id="tspan6568-0"
+                 style="font-weight:700;fill:#000000;stroke:none">30mm</tspan></tspan></tspan></text>
+</g></g><g
+       transform="translate(63.348836,-18.514339)"
+       style="display:inline"
+       class="com.sun.star.drawing.TextShape"
+       id="g6887-0"><g
+         id="id76-8"><text
+           class="TextShape"
+           id="text6890-6"><tspan
+             class="TextParagraph"
+             font-size="318px"
+             font-weight="400"
+             id="tspan6892-8"
+             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
+               class="TextPosition"
+               x="14863"
+               y="3963"
+               id="tspan6894-2"><tspan
+                 id="tspan6896-6"
+                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
+</g></g><g
+       transform="translate(2115.7803,1718.1584)"
+       style="display:inline"
+       class="com.sun.star.drawing.TextShape"
+       id="g6887-0-9"><g
+         id="id76-8-5"><text
+           class="TextShape"
+           id="text6890-6-9"><tspan
+             class="TextParagraph"
+             font-size="318px"
+             font-weight="400"
+             id="tspan6892-8-9"
+             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
+               class="TextPosition"
+               x="14863"
+               y="3963"
+               id="tspan6894-2-9"><tspan
+                 id="tspan6896-6-7"
+                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
+</g></g><g
+       transform="translate(6536.4019,1283.9902)"
+       style="display:inline"
+       class="com.sun.star.drawing.TextShape"
+       id="g6887-0-9-8"><g
+         id="id76-8-5-1"><text
+           class="TextShape"
+           id="text6890-6-9-8"><tspan
+             class="TextParagraph"
+             font-size="318px"
+             font-weight="400"
+             id="tspan6892-8-9-7"
+             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
+               class="TextPosition"
+               x="14863"
+               y="3963"
+               id="tspan6894-2-9-0"><tspan
+                 id="tspan6896-6-7-5"
+                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
+</g></g><g
+       transform="translate(300.16789,8388.5605)"
+       style="display:inline"
+       class="com.sun.star.drawing.TextShape"
+       id="g6887-0-9-8-5"><g
+         id="id76-8-5-1-7"><text
+           class="TextShape"
+           id="text6890-6-9-8-0"><tspan
+             class="TextParagraph"
+             font-size="318px"
+             font-weight="400"
+             id="tspan6892-8-9-7-7"
+             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
+               class="TextPosition"
+               x="14863"
+               y="3963"
+               id="tspan6894-2-9-0-0"><tspan
+                 id="tspan6896-6-7-5-1"
+                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
+</g></g></g><g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="RAMBO"
@@ -3938,27 +4036,6 @@
 </g></g><g
        style="display:inline"
        class="com.sun.star.drawing.TextShape"
-       id="g6557"><g
-         id="id40"><text
-           class="TextShape"
-           id="text6560"><tspan
-             class="TextParagraph"
-             font-size="388px"
-             font-weight="400"
-             id="tspan6562"
-             style="font-size:388px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="15105"
-               y="12386"
-               id="tspan6564"><tspan
-                 id="tspan6566"
-                 style="fill:#000000;stroke:none">L1= </tspan><tspan
-                 font-weight="700"
-                 id="tspan6568"
-                 style="font-weight:700;fill:#000000;stroke:none">30mm</tspan></tspan></tspan></text>
-</g></g><g
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
        id="g6632"><g
          id="id47"><text
            class="TextShape"
@@ -4070,24 +4147,6 @@
 </g></g><g
        style="display:inline"
        class="com.sun.star.drawing.TextShape"
-       id="g6546"><g
-         id="id39"><text
-           class="TextShape"
-           id="text6549"><tspan
-             class="TextParagraph"
-             font-size="318px"
-             font-weight="400"
-             id="tspan6551"
-             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="21455"
-               y="5248"
-               id="tspan6553"><tspan
-                 id="tspan6555"
-                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
-</g></g><g
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
        id="g6576"><g
          id="id41"><text
            class="TextShape"
@@ -4146,60 +4205,6 @@
                id="tspan6608"><tspan
                  id="tspan6610"
                  style="fill:#000000;stroke:none">pre-cut/pre-stripped</tspan></tspan></tspan></text>
-</g></g><g
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6876"><g
-         id="id75"><text
-           class="TextShape"
-           id="text6879"><tspan
-             class="TextParagraph"
-             font-size="388px"
-             font-weight="400"
-             id="tspan6881"
-             style="font-size:388px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="4142"
-               y="4463"
-               id="tspan6883"><tspan
-                 id="tspan6885"
-                 style="fill:#000000;stroke:none">L1= 30mm</tspan></tspan></tspan></text>
-</g></g><g
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6887"><g
-         id="id76"><text
-           class="TextShape"
-           id="text6890"><tspan
-             class="TextParagraph"
-             font-size="318px"
-             font-weight="400"
-             id="tspan6892"
-             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="14863"
-               y="3963"
-               id="tspan6894"><tspan
-                 id="tspan6896"
-                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
-</g></g><g
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6898"><g
-         id="id77"><text
-           class="TextShape"
-           id="text6901"><tspan
-             class="TextParagraph"
-             font-size="318px"
-             font-weight="400"
-             id="tspan6903"
-             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="16991"
-               y="5713"
-               id="tspan6905"><tspan
-                 id="tspan6907"
-                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
 </g></g><text
        style="font-size:12px;display:inline"
        class="TextShape"
@@ -4429,7 +4434,7 @@
          x="19103.977"
          y="14296.387"
          style="font-weight:normal"
-         id="tspan14611">To CRAMPS Z</tspan><tspan
+         id="tspan14611">To CRAMPS E2</tspan><tspan
          sodipodi:role="line"
          x="19103.977"
          y="14719.721"
@@ -4451,7 +4456,7 @@
          x="24297.062"
          y="7350.8892"
          style="font-weight:normal"
-         id="tspan14611-3">To CRAMPS E2</tspan><tspan
+         id="tspan14611-3">To CRAMPS Z</tspan><tspan
          sodipodi:role="line"
          x="24297.062"
          y="7774.2222"
@@ -4482,25 +4487,25 @@
 <text
        xml:space="preserve"
        style="font-size:338.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       x="22220.055"
-       y="9215.8975"
+       x="21542.205"
+       y="9320.1826"
        id="text14607-5-0"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan14609-6-9"
-         x="22220.055"
-         y="9215.8975"
+         x="21542.205"
+         y="9320.1826"
          style="font-weight:bold">Y Switch (Y Min)</tspan><tspan
          sodipodi:role="line"
-         x="22220.055"
-         y="9639.2305"
+         x="21542.205"
+         y="9743.5156"
          style="font-weight:normal"
-         id="tspan14615-5-8">To CRAMPS P501 Connector,</tspan><tspan
+         id="tspan14615-5-8">To CRAMPS P502 &quot;&lt;Y&quot; Connector</tspan><tspan
          sodipodi:role="line"
-         x="22220.055"
-         y="10062.564"
+         x="21542.205"
+         y="10166.85"
          style="font-weight:normal"
-         id="tspan15160">&quot;&lt;Y&quot; pin &quot;S&quot; &amp; &quot;-&quot;</tspan></text>
+         id="tspan15160">5,6 &quot;+/-&quot; pins</tspan></text>
 <text
        xml:space="preserve"
        style="font-size:338.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
@@ -4514,7 +4519,7 @@
          y="3847.9993"
          style="font-size:395.1111145px;font-weight:bold"><tspan
    style="font-size:395.1111145px;font-weight:normal"
-   id="tspan14801">Total L= </tspan>???mm</tspan><tspan
+   id="tspan14801">Total L= </tspan>190mm</tspan><tspan
          sodipodi:role="line"
          x="8010.9126"
          y="4341.8882"
@@ -4523,20 +4528,20 @@
 <text
        xml:space="preserve"
        style="font-size:338.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       x="17973.43"
-       y="3092.2183"
+       x="17947.359"
+       y="2857.5776"
        id="text14607-5-9-7"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan14609-6-2-5"
-         x="17973.43"
-         y="3092.2183"
+         x="17947.359"
+         y="2857.5776"
          style="font-size:395.1111145px;font-weight:bold"><tspan
    style="font-size:395.1111145px;font-weight:normal"
-   id="tspan14801-8">Total L= </tspan>???mm</tspan><tspan
+   id="tspan14801-8">Total L= </tspan>200mm</tspan><tspan
          sodipodi:role="line"
-         x="17973.43"
-         y="3586.1072"
+         x="17947.359"
+         y="3351.4666"
          style="font-size:395.1111145px;font-weight:normal"
          id="tspan14615-5-7-7">pre-cut/pre-stripped</tspan></text>
 <text
@@ -4552,111 +4557,13 @@
          y="11423.84"
          style="font-size:395.1111145px;font-weight:bold"><tspan
    style="font-size:395.1111145px;font-weight:normal"
-   id="tspan14801-8-2">Total L= </tspan>???mm</tspan><tspan
+   id="tspan14801-8-2">Total L= 250</tspan>mm</tspan><tspan
          sodipodi:role="line"
          x="6713.3062"
          y="11917.729"
          style="font-size:395.1111145px;font-weight:normal"
          id="tspan14615-5-7-7-1">pre-cut/pre-stripped</tspan></text>
-<g
-       transform="translate(-10927.532,-7903.0808)"
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6557-5"><g
-         id="id40-2"><text
-           class="TextShape"
-           id="text6560-1"><tspan
-             class="TextParagraph"
-             font-size="388px"
-             font-weight="400"
-             id="tspan6562-6"
-             style="font-size:388px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="15105"
-               y="12386"
-               id="tspan6564-5"><tspan
-                 id="tspan6566-0"
-                 style="fill:#000000;stroke:none">L1=</tspan><tspan
-                 font-weight="700"
-                 id="tspan6568-0"
-                 style="font-weight:700;fill:#000000;stroke:none">30mm</tspan></tspan></tspan></text>
-</g></g><g
-       transform="translate(63.348835,-18.514339)"
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6887-0"><g
-         id="id76-8"><text
-           class="TextShape"
-           id="text6890-6"><tspan
-             class="TextParagraph"
-             font-size="318px"
-             font-weight="400"
-             id="tspan6892-8"
-             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="14863"
-               y="3963"
-               id="tspan6894-2"><tspan
-                 id="tspan6896-6"
-                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
-</g></g><g
-       transform="translate(2115.7803,1718.1584)"
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6887-0-9"><g
-         id="id76-8-5"><text
-           class="TextShape"
-           id="text6890-6-9"><tspan
-             class="TextParagraph"
-             font-size="318px"
-             font-weight="400"
-             id="tspan6892-8-9"
-             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="14863"
-               y="3963"
-               id="tspan6894-2-9"><tspan
-                 id="tspan6896-6-7"
-                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
-</g></g><g
-       transform="translate(6536.4019,1283.9902)"
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6887-0-9-8"><g
-         id="id76-8-5-1"><text
-           class="TextShape"
-           id="text6890-6-9-8"><tspan
-             class="TextParagraph"
-             font-size="318px"
-             font-weight="400"
-             id="tspan6892-8-9-7"
-             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="14863"
-               y="3963"
-               id="tspan6894-2-9-0"><tspan
-                 id="tspan6896-6-7-5"
-                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
-</g></g><g
-       transform="translate(300.16788,8388.5606)"
-       style="display:inline"
-       class="com.sun.star.drawing.TextShape"
-       id="g6887-0-9-8-5"><g
-         id="id76-8-5-1-7"><text
-           class="TextShape"
-           id="text6890-6-9-8-0"><tspan
-             class="TextParagraph"
-             font-size="318px"
-             font-weight="400"
-             id="tspan6892-8-9-7-7"
-             style="font-size:318px;font-weight:400;font-family:'Liberation Sans, sans-serif'"><tspan
-               class="TextPosition"
-               x="14863"
-               y="3963"
-               id="tspan6894-2-9-0-0"><tspan
-                 id="tspan6896-6-7-5-1"
-                 style="fill:#000000;stroke:none">L1</tspan></tspan></tspan></text>
-</g></g><text
+<text
        xml:space="preserve"
        style="font-size:338.66662598px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
        x="18470.42"
@@ -4667,7 +4574,7 @@
          x="18470.42"
          y="8742.2588"
          style="font-size:395.1111145px;font-weight:normal"
-         id="tspan14615-5-6">???mm</tspan></text>
+         id="tspan14615-5-6">250mm</tspan></text>
 <text
        id="text15094"
        class="TextShape"
