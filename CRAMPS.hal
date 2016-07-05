@@ -1,8 +1,12 @@
 # #######################################
 #
-# HAL file for BeagleBone + BeBoPr cape with 4 steppers
+# HAL file for TAZ-5 BeagleBone + CRAMPS cape retrofit
 #
-# Derived from example hm2-stepper config
+# Derived from example CRAMPS config
+#
+# See https://github.com/zultron/taz_machinekit_retrofit
+#
+# Pin assignments are documented in setup.sh
 #
 # ########################################
 
@@ -24,15 +28,17 @@ loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AX
 
 
 # load low-level drivers
-loadrt hal_bb_gpio output_pins=816,822,823,824,825,826,914,923,925 input_pins=807,808,809,810,817,911,913
+loadrt hal_bb_gpio output_pins=816,822,823,824,825,826,914,921,923,925,941 input_pins=807,808,809,810,817,911,913
 loadrt [PRUCONF](DRIVER) prucode=$(HAL_RTMOD_DIR)/[PRUCONF](PRUBIN) [PRUCONF](CONFIG) halname=hpg
-loadrt pid count=2
+setp hpg.pwmgen.00.pwm_period       10000000
+
+loadrt pid count=3
 loadrt limit1 count=2
 
 
 # Python user-mode HAL module to read ADC value and generate a thermostat output for PWM
 # c = analog input channel and thermistor table
-loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:epcos_B57560G1104,05:epcos_B57560G1104 -b CRAMPS
+loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:epcos_B57560G1104,05:epcos_B57560G1104,06:epcos_B57560G1104 -b CRAMPS
 
 # ################################################
 # THREADS
@@ -44,9 +50,10 @@ addf motion-command-handler               servo-thread
 addf motion-controller                    servo-thread
 addf pid.0.do-pid-calcs                   servo-thread
 addf pid.1.do-pid-calcs                   servo-thread
+addf pid.2.do-pid-calcs                   servo-thread
 addf limit1.0                             servo-thread
 addf limit1.1                             servo-thread
-addf hpg.update             servo-thread
+addf hpg.update                           servo-thread
 addf bb_gpio.write                        servo-thread
 
 
@@ -58,6 +65,8 @@ addf bb_gpio.write                        servo-thread
 # ################
 # X [0] Axis
 # ################
+#
+# Attached to CRAMPS X motor connector with hpg.stepgen.00
 
 # axis enable chain
 newsig emcmot.00.enable bit
@@ -93,10 +102,19 @@ setp hpg.stepgen.00.steppin        813
 # P8.44 PRU1.out4
 setp hpg.stepgen.00.dirpin         812
 
+# Limit switch
+newsig limit-x-min bit
+net limit-x-min <= bb_gpio.p8.in-08
+setp bb_gpio.p8.in-08.invert 1
+net limit-x-min => axis.0.home-sw-in
+net limit-x-min => axis.0.neg-lim-sw-in
+
 
 # ################
 # Y [1] Axis
 # ################
+#
+# Attached to CRAMPS Y motor connector with hpg.stepgen.01
 
 # axis enable chain
 newsig emcmot.01.enable bit
@@ -132,25 +150,44 @@ setp hpg.stepgen.01.steppin        815
 # P8.39 PRU1.out6
 setp hpg.stepgen.01.dirpin         814
 
+# Limit switch
+newsig limit-y-min bit
+net limit-y-min <= bb_gpio.p8.in-10
+setp bb_gpio.p8.in-10.invert 1
+net limit-y-min => axis.1.home-sw-in
+net limit-y-min => axis.1.neg-lim-sw-in
+
 
 # ################
 # Z [2] Axis
 # ################
 
+# The TAZ-5 Z axis has only one limit switch, even though it has two
+# motors.  Instead of using gantrykins or the gantry HAL component,
+# simply tie both joints' stepgens together.
+
 # axis enable chain
 newsig emcmot.02.enable bit
 sets emcmot.02.enable FALSE
-
 net emcmot.02.enable <= axis.2.amp-enable-out
-net emcmot.02.enable => hpg.stepgen.02.enable
-
+# ...per-joint enable netted below
 
 # position command and feedback
 net emcmot.02.pos-cmd <= axis.2.motor-pos-cmd
-net emcmot.02.pos-cmd => hpg.stepgen.02.position-cmd
-
-net motor.02.pos-fb <= hpg.stepgen.02.position-fb
 net motor.02.pos-fb => axis.2.motor-pos-fb
+# ...per-joint positions netted below
+
+# #######
+# Right motor
+#
+# Attached to CRAMPS Z motor connector with hpg.stepgen.02
+
+# enable
+net emcmot.02.enable => hpg.stepgen.02.enable
+
+# position command and feedback
+net emcmot.02.pos-cmd => hpg.stepgen.02.position-cmd
+net motor.02.pos-fb <= hpg.stepgen.02.position-fb
 
 
 # timing parameters
@@ -172,44 +209,167 @@ setp hpg.stepgen.02.steppin        819
 setp hpg.stepgen.02.dirpin         818
 
 
+# #######
+# Left motor
+#
+# Attached to CRAMPS E2 motor connector with hpg.stepgen.03
+
+# enable stepgen
+net emcmot.02.enable => hpg.stepgen.03.enable
+
+# position command and feedback
+net emcmot.02.pos-cmd => hpg.stepgen.03.position-cmd
+# (feedback supplied by hpg.stepgen.02)
+
+# timing parameters
+setp hpg.stepgen.03.dirsetup        [AXIS_2]DIRSETUP
+setp hpg.stepgen.03.dirhold         [AXIS_2]DIRHOLD
+
+setp hpg.stepgen.03.steplen         [AXIS_2]STEPLEN
+setp hpg.stepgen.03.stepspace       [AXIS_2]STEPSPACE
+
+setp hpg.stepgen.03.position-scale  [AXIS_2]SCALE
+
+setp hpg.stepgen.03.maxvel          [AXIS_2]STEPGEN_MAX_VEL
+setp hpg.stepgen.03.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
+
+#setp hpg.stepgen.03.step_type       0
+setp hpg.stepgen.03.steppin        924
+setp hpg.stepgen.03.dirpin         926
+
+# ######
+# Limit switch
+newsig limit-z-min bit
+net limit-z-min <= bb_gpio.p9.in-13
+setp bb_gpio.p9.in-13.invert 1
+net limit-z-min => axis.2.home-sw-in
+net limit-z-min => axis.2.neg-lim-sw-in
+
+
 # ################
-# A [3] Axis (Extruder)
+# A [3] Axis (MUXed Extruders)
 # ################
+#
+# Extruders should be MUXed; TBD
+
+# ##########
+# Extruder 1
+#
+# Attached to CRAMPS E0 motor connector with hpg.stepgen.04
 
 # axis enable chain
 newsig emcmot.03.enable bit
 sets emcmot.03.enable FALSE
 
 net emcmot.03.enable <= axis.3.amp-enable-out
-net emcmot.03.enable => hpg.stepgen.03.enable
-
+net emcmot.03.enable => hpg.stepgen.04.enable
 
 # position command and feedback
 net emcmot.03.pos-cmd <= axis.3.motor-pos-cmd
-net emcmot.03.pos-cmd => hpg.stepgen.03.position-cmd
+net emcmot.03.pos-cmd => hpg.stepgen.04.position-cmd
 
-net motor.03.pos-fb <= hpg.stepgen.03.position-fb
+net motor.03.pos-fb <= hpg.stepgen.04.position-fb
 net motor.03.pos-fb => axis.3.motor-pos-fb
 
 
 # timing parameters
-setp hpg.stepgen.03.dirsetup        [AXIS_3]DIRSETUP
-setp hpg.stepgen.03.dirhold         [AXIS_3]DIRHOLD
+setp hpg.stepgen.04.dirsetup        [AXIS_3]DIRSETUP
+setp hpg.stepgen.04.dirhold         [AXIS_3]DIRHOLD
 
-setp hpg.stepgen.03.steplen         [AXIS_3]STEPLEN
-setp hpg.stepgen.03.stepspace       [AXIS_3]STEPSPACE
+setp hpg.stepgen.04.steplen         [AXIS_3]STEPLEN
+setp hpg.stepgen.04.stepspace       [AXIS_3]STEPSPACE
 
-setp hpg.stepgen.03.position-scale  [AXIS_3]SCALE
+setp hpg.stepgen.04.position-scale  [AXIS_3]SCALE
 
-setp hpg.stepgen.03.maxvel          [AXIS_3]STEPGEN_MAX_VEL
-setp hpg.stepgen.03.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
+setp hpg.stepgen.04.maxvel          [AXIS_3]STEPGEN_MAX_VEL
+setp hpg.stepgen.04.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
 
-#setp hpg.stepgen.03.step_type       0
-# P8.30 GPIO2.25
-setp hpg.stepgen.03.steppin        916
-# P8.21 GPIO1.30
-setp hpg.stepgen.03.dirpin         912
+#setp hpg.stepgen.04.step_type       0
+setp hpg.stepgen.04.steppin        916
+setp hpg.stepgen.04.dirpin         912
 
+# heater
+newsig e0.temp.set   float
+newsig e0.temp.meas  float
+
+# E1 heater on FET 2
+setp hpg.pwmgen.00.out.01.pin       915
+setp hpg.pwmgen.00.out.01.enable    1
+setp hpg.pwmgen.00.out.01.value     0.0
+
+# E1 PID
+net e0.temp.meas    <= Therm.ch-05.value
+net e0.temp.meas    => pid.1.feedback
+sets e0.temp.set  0
+net e0.temp.set     => pid.1.command
+
+net e0.heater  <= pid.1.output
+net e0.heater  => limit1.0.in
+net e0.heaterl <= limit1.0.out
+net e0.heaterl => hpg.pwmgen.00.out.01.value
+
+# Limit heater PWM to positive values
+# PWM mimics hm2 implementation, which generates output for negative values
+setp limit1.0.min 0
+
+# PID parameters
+#setp pid.1.FF0      0
+#setp pid.1.FF1      0
+#setp pid.1.FF2      0
+setp pid.1.Pgain  0.30
+setp pid.1.Igain  0.00001
+setp pid.1.Dgain  0.9375
+setp pid.1.maxerrorI 1.0
+setp pid.1.bias    0.5
+setp pid.1.enable   1
+
+# E1 Fan FET 4
+newsig e0.fan bit
+net e0.fan => bb_gpio.p9.out-21
+
+# ##########
+# Extruder 2
+#
+# Attached to CRAMPS E1 motor connector
+#
+# TBD
+
+# axis enable chain
+#net extmux.enable => hpg.stepgen.05.enable
+
+# position command and feedback
+#net extmux.pos-cmd => hpg.stepgen.05.position-cmd
+#net extmux.pos-fb <= hpg.stepgen.05.position-fb
+
+# timing parameters
+#setp hpg.stepgen.05.dirsetup        [AXIS_3]DIRSETUP
+#setp hpg.stepgen.05.dirhold         [AXIS_3]DIRHOLD
+
+#setp hpg.stepgen.05.steplen         [AXIS_3]STEPLEN
+#setp hpg.stepgen.05.stepspace       [AXIS_3]STEPSPACE
+
+#setp hpg.stepgen.05.position-scale  [AXIS_3]SCALE
+
+#setp hpg.stepgen.05.maxvel          [AXIS_3]STEPGEN_MAX_VEL
+#setp hpg.stepgen.05.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
+
+#setp hpg.stepgen.05.step_type       0
+#setp hpg.stepgen.05.steppin        917
+#setp hpg.stepgen.05.dirpin         918
+
+# # heater
+# newsig e0.temp.set   float
+# newsig e0.temp.meas  float
+
+# # E2 Heater FET 3
+# setp hpg.pwmgen.00.out.02.pin       927
+# setp hpg.pwmgen.00.out.02.enable    1
+# setp hpg.pwmgen.00.out.02.value     0.0
+# [...]
+
+# E2 Fan FET 5
+newsig e2.fan bit
+net e2.fan => bb_gpio.p9.out-41
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -240,151 +400,29 @@ net emcmot.00.enable => bb_gpio.p9.out-23
 # Feel free to tie any other signal you like to the LED
 net emcmot.00.enable => bb_gpio.p9.out-25
 
-# ################
-# Limit Switches
-# ################
-newsig limit-x-min bit
-newsig limit-x-max bit
-newsig limit-y-min bit
-newsig limit-y-max bit
-newsig limit-z-min bit
-newsig limit-z-max bit
-
-net limit-x-min <= bb_gpio.p8.in-08
-net limit-x-max <= bb_gpio.p8.in-07
-net limit-y-min <= bb_gpio.p8.in-10
-net limit-y-max <= bb_gpio.p8.in-09
-net limit-z-min <= bb_gpio.p9.in-13
-net limit-z-max <= bb_gpio.p9.in-11
-
-# Adjust as needed for your switch polarity
-setp bb_gpio.p8.in-08.invert 1
-setp bb_gpio.p8.in-07.invert 1
-setp bb_gpio.p8.in-10.invert 1
-setp bb_gpio.p8.in-09.invert 1
-setp bb_gpio.p9.in-11.invert 1
-setp bb_gpio.p9.in-13.invert 1
-
-# Uncomment if you actually have limit switches setup
-# You probably want to setup homing in the INI file, as well
-#net limit-x-min => axis.0.home-sw-in
-#net limit-x-min => axis.0.neg-lim-sw-in
-#net limit-x-max => axis.0.pos-lim-sw-in
-#net limit-y-min => axis.1.home-sw-in
-#net limit-y-min => axis.1.neg-lim-sw-in
-#net limit-y-max => axis.1.pos-lim-sw-in
-#net limit-z-min => axis.2.home-sw-in
-#net limit-z-min => axis.2.neg-lim-sw-in
-#net limit-z-max => axis.2.pos-lim-sw-in
-
-# ################
-# Servo signals
-# ################
-
-# There is currently no driver to generate pulses for actual
-# radio-control style servos, but the buffered 5V output
-# signals can be used as GPIO
-
-# !!! WARNING !!!
-# BBB on-board eMMC *MUST* be disabled in order to use these!
-# Drive eMMC-disabled signal high to enable signals that overlap
-# with the eMMC pins on P8, otherwise they are tri-stated
-#
-# You also need to edit the setup.sh file to enable the GPIO pins
-
-# Signal the hardware that eMMC has been disabled and it is safe
-# to drive the signals connected to eMMC lines (active low)
-newsig eMMC-disabled bit
-sets eMMC-disabled 0
-net eMMC-disabled bb_gpio.p8.out-16
-setp bb_gpio.p8.out-16.invert 1
-
-# Servo signals, output only, driven by an 'ACT125
-
-newsig servo.1 bit
-newsig servo.2 bit
-newsig servo.3 bit
-newsig servo.4 bit
-
-sets servo.1 0
-sets servo.2 0
-sets servo.3 0
-sets servo.4 0
-
-net servo.1 bb_gpio.p8.out-25
-net servo.2 bb_gpio.p8.out-24
-net servo.3 bb_gpio.p8.out-23
-net servo.4 bb_gpio.p8.out-22
-
-
 # ##################################################
-# PWM and Temperature Signals
+# Heated Bed
 # ##################################################
 
 # Define signals to use elsewhere (ie: M1xx codes)
 # If you change any names here, lots of things will break!
-newsig e0.temp.set   float
-newsig e0.temp.meas  float
 newsig bed.temp.set  float
 newsig bed.temp.meas float
 
-
-setp hpg.pwmgen.00.pwm_period       10000000
 
 # Bed Heater FET 1
 setp hpg.pwmgen.00.out.00.pin       811
 setp hpg.pwmgen.00.out.00.enable    1
 setp hpg.pwmgen.00.out.00.value     0.0
 
-# E0 Heater FET 2
-setp hpg.pwmgen.00.out.01.pin       915
-setp hpg.pwmgen.00.out.01.enable    1
-setp hpg.pwmgen.00.out.01.value     0.0
-
-# E1 Heater FET 3
-setp hpg.pwmgen.00.out.02.pin       927
-setp hpg.pwmgen.00.out.02.enable    1
-setp hpg.pwmgen.00.out.02.value     0.0
-
-# E2 Heater FET 4
-setp hpg.pwmgen.00.out.03.pin       921
-setp hpg.pwmgen.00.out.03.enable    1
-setp hpg.pwmgen.00.out.03.value     0.0
-
-# FET 5 - Fan / LED
-setp hpg.pwmgen.00.out.04.pin       941
-setp hpg.pwmgen.00.out.04.enable    1
-setp hpg.pwmgen.00.out.04.value     0.0
-
-# FET 6 - Fan / LED
-setp hpg.pwmgen.00.out.05.pin       922
-setp hpg.pwmgen.00.out.05.enable    1
-setp hpg.pwmgen.00.out.05.value     0.0
-
-# PID for Extruder 0 temperature control
-net e0.temp.meas    <= Therm.ch-04.value
-net e0.temp.meas    => pid.0.feedback
-
-sets e0.temp.set  0
-net e0.temp.set     => pid.0.command
-
-net e0.heater  <= pid.0.output
-net e0.heater  => limit1.0.in
-net e0.heaterl <= limit1.0.out
-net e0.heaterl => hpg.pwmgen.00.out.01.value
-
-# Limit heater PWM to positive values
-# PWM mimics hm2 implementation, which generates output for negative values
-setp limit1.0.min 0
-
 # PID for Bed temperature control
-net bed.temp.meas    <= Therm.ch-05.value
-net bed.temp.meas    => pid.1.feedback
+net bed.temp.meas    <= Therm.ch-04.value
+net bed.temp.meas    => pid.0.feedback
 
 sets bed.temp.set  0
-net bed.temp.set     => pid.1.command
+net bed.temp.set     => pid.0.command
 
-net bed.heater  <= pid.1.output
+net bed.heater  <= pid.0.output
 net bed.heater  => limit1.1.in
 net bed.heaterl <= limit1.1.out
 net bed.heaterl => hpg.pwmgen.00.out.00.value
@@ -394,24 +432,15 @@ net bed.heaterl => hpg.pwmgen.00.out.00.value
 setp limit1.1.min 0
 
 # PID Parameters for adjusting temperature control
-# Extruder
+# Bed
 #setp pid.0.FF0      0
 #setp pid.0.FF1      0
 #setp pid.0.FF2      0
-setp pid.0.Pgain  0.30
-setp pid.0.Igain  0.00001
-setp pid.0.Dgain  0.9375
+setp pid.0.Pgain  1
+setp pid.0.Igain  0.0
+setp pid.0.Dgain  0.0
 setp pid.0.maxerrorI 1.0
 setp pid.0.bias    0.5
 setp pid.0.enable   1
 
-# Bed
-#setp pid.1.FF0      0
-#setp pid.1.FF1      0
-#setp pid.1.FF2      0
-setp pid.1.Pgain  1
-setp pid.1.Igain  0.0
-setp pid.1.Dgain  0.0
-setp pid.1.maxerrorI 1.0
-setp pid.1.bias    0.5
-setp pid.1.enable   1
+

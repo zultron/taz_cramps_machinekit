@@ -2,6 +2,10 @@
 # Copyright 2013
 # Charles Steinkuehler <charles@steinkuehler.net>
 #
+# Modified for the LulzBot TAZ 5 Machinekit Retrofit by John Morris
+# <john@zultron.com> 2016-07; see
+# https://github.com/zultron/taz_machinekit_retrofit
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -72,22 +76,59 @@ fi
 # enable bits properly.  These pins _can_ however be set here without
 # causing problems.  You may wish to do this for documentation or to make
 # sure the pin starts with a known value as soon as possible.
+#
+# TAZ-5 configuration:
+#
+# The below are organized for the TAZ-5 retrofit project.  The
+# additional comment column labels the pin function in the TAZ, which
+# may be different from markings on the CRAMPS board.  Thermistors are
+# noted for completeness, but are configured in CRAMPS.hal for reading
+# by the hal_temp_bbb script.
 
 sudo $(which config-pin) -f - <<- EOF
 
-	P8.07	in	# X Max
-	P8.08	in	# X Min
-	P8.09	in	# Y Max
-	P8.10	in	# Y Min
-	P8.11	low	# FET 1 : Heated Bed
-	P8.12	low	# X Dir
-	P8.13	low	# X Step
-	P8.14	low	# Y Dir
-	P8.15	low	# Y Step
-	P8.16	high	# eMMC Enable
+# X motor
+	P8.13	low	# X Step		Step
+	P8.12	low	# X Dir			Dir
+	P8.08	in	# X Min			Limit switch
+# Y motor
+	P8.15	low	# Y Step		Step
+	P8.14	low	# Y Dir			Dir
+	P8.10	in	# Y Min			Limit switch
+# Z motors
+	P8.19	low	# Z Step		Right step
+	P8.18	low	# Z Dir			Right dir
+	P9.24	low	# E2 Step		Left step
+	P9.26	low	# E2 Dir		Left dir
+	P9.13	in	# Z Min			Limit switch
+# Extruder 1
+	P9.16	low	# E0 Step		Step
+	P9.12	low	# E0 Dir		Dir
+	P9.15	low	# FET 2 : E0		Heater
+	P9.27	low	# FET 3 : E2		Fan
+	# Analog in 5	# Therm 1		Temp
+# Extruder 2
+	P9.17	low	# E1 Step		Step
+	P9.18	low	# E1 Dir		Dir
+	P9.21	low	# FET 4 : E1		Heater
+	P9.41	low	# FET 5			Fan
+	# Analog in 6	# Therm 2		Temp
+# Heated bed
+	P8.11	low	# FET 1 : Heated Bed	On/Off
+	# Analog in 7	# Therm 0		Temp
+# Misc
+	P9.14	high	# Axis Enable, active low
 	P8.17	in	# ESTOP
-	P8.18	low	# Z Dir
-	P8.19	low	# Z Step
+	P8.26	high	# ESTOP Out
+	P9.23	low	# Machine Power
+	P9.25	low	# LED			LED tied to Machine Power
+# Unused
+	P8.07	in	# X Max
+	P8.09	in	# Y Max
+	P9.11	in	# Z Max
+	P9.22	low	# FET 6
+# Other
+	P8.16	high	# eMMC Enable
 
 # eMMC signals, uncomment *ONLY* if you have disabled the on-board eMMC!
 # Machinekit images disable eMMC and HDMI audio by default in uEnv.txt:
@@ -97,31 +138,14 @@ sudo $(which config-pin) -f - <<- EOF
 #	P8.24	low	# Servo 2
 #	P8.25	low	# Servo 1
 
-	P8.26	high	# ESTOP Out
 
-	P9.11	in	# Z Max
-	P9.12	low	# E0 Dir
-	P9.13	in	# Z Min
-	P9.14	high	# Axis Enable, active low
-	P9.15	low	# FET 2 : E0
-	P9.16	low	# E0 Step
-	P9.17	low	# E1 Step
-	P9.18	low	# E1 Dir
 #	P9.19	low	# I2C SCL
 #	P9.20	low	# I2C SDA
-	P9.21	low	# FET 4 : E1
-	P9.22	low	# FET 6
-	P9.23	low	# Machine Power
-	P9.24	low	# E2 Step
-	P9.25	low	# LED
-	P9.26	low	# E2 Dir
-	P9.27	low	# FET 3 : E2
 	P9.28	low	# SPI CS0
 	P9.29	low	# SPI MISO
 	P9.30	low	# SPI MOSI
 	P9.31	low	# SPI SCLK
 
-	P9.41	low	# FET 5
 	P9.91	in	# Reserved, connected to P9.41
 
 	P9.42	low	# SPI CS1
