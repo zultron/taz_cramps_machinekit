@@ -38,7 +38,16 @@ loadrt limit1 count=2
 
 # Python user-mode HAL module to read ADC value and generate a thermostat output for PWM
 # c = analog input channel and thermistor table
-loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:epcos_B57560G1104,05:epcos_B57560G1104,06:epcos_B57560G1104 -b CRAMPS
+#
+# The Hexagon Hot End thermistor [1] is a EPCOS 100k [2], not the same
+# as the 24V silicone heater [3] that uses a Honeywell 100k [4], [5].
+#    
+# [1]: https://www.lulzbot.com/store/parts/100k-epcos-thermistor
+# [2]: http://www.epcos.com/inf/50/db/ntc_09/Glass_enc_Sensors__B57560__G560__G1560.pdf
+# [3]: https://www.lulzbot.com/store/parts/24v-silicone-heater
+# [4]: https://www.lulzbot.com/store/parts/100k-honeywell-axial-thermistor
+# [5]: http://media.digikey.com/pdf/Data%20Sheets/Honeywell%20Sensing%20&%20Control%20PDFs/135-104LAG-J01.pdf
+loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:honeywell_100k_135-104LAG-J01,05:epcos_B57560G1104,06:epcos_B57560G1104 -b CRAMPS
 
 # ################################################
 # THREADS
