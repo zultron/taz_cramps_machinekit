@@ -1,7 +1,54 @@
+# Dual extruders
+
+From [flexydually OHAI][fd-ohai]:
+
+- Only one switchable fan
+- [Duallie docs][duallie]
+- Set temps:
+  - Change tool head with `T0` (rear) and `T1` (front)
+  - GUI has entry fields for extruder temp and bed (e.g. 240 and 100
+    deg. C)
+  - Wait until temp hits target, then click 'print' button
+- Fan
+  - Seems to be turned on per print; like coolant?
+  - Apparently needs PWM to control speed?
+  - `M106 P0 S255` sets fan 1 PWM on 100%
+  - Repetier usage: `M106 P1 T45 H1:2` sets fan 2 to 'thermostatic'
+    mode, on when either heater 1 or 2 is above 45 C.
+  - `M107` is fan off (deprecated)
+  - PWM period [may matter][fan-pwm]
+  
+
+[fd-ohai]: https://ohai.lulzbot.com/project/lulzbot-taz-flexydually-tool-head-v2-installation/accessories/
+[duallie]: http://devel.lulzbot.com/TAZ/accessories/javelin/
+[fan-pwm]: https://groups.google.com/forum/#!topic/machinekit/BSLiZSQKoDQ
+
+# 3D printer G code
+- G codes at [reprap.org][rro-gcode]; note that 'Machinekit' is
+  included in instruction implementation notes
+- Some G codes in Machinekit `nc_files/` subdir:
+  - `M104` set extruder temp
+  - `M106 S255` fan off/on
+- Daren Schwenke has a lot of M codes [implemented][ds-mcodes]
+
+
+[rro-gcode]: http://reprap.org/wiki/G-code
+[ds-mcodes]: https://github.com/Arcus-3d/Arcus-3D-M1
+
 # INI file
 INI [docs][1]
 
 [1]: http://www.machinekit.io/docs/config/ini_config/
+
+## Steps/mm
+
+From [flexydually OHAI][fd-ohai]:
+
+- X 100.5
+- Y 100.5
+- Z 1600.0
+- Extruder:  configurable, from label
+- Retract 3000
 
 ## Homing
 
@@ -104,13 +151,18 @@ INI [docs][1]
   - Put the volt meter on the `Step` pin 7, and verify the voltage
     increases some small amount above 0V
 - Test ESTOP:
-  - Remove the jumper from CRAMPS `ESTOP` connector P302; verify that
+  - Remove the shunt from CRAMPS `ESTOP` connector P302; verify that
     the machine has reset in Axis; verify the CRAMPS `ESTOP` LED
     turns on
-  - Replace the jumper; in Axis, toggle ESTOP and machine power;
+  - Replace the shunt; in Axis, toggle ESTOP and machine power;
     verify the CRAMPS `ESTOP` LED turns off
 - Test machine power signal:
   - Toggle machine power button in Axis; verify `STATUS` LED lights
     with power on
-- Test bed and extruder heater FETs: FIXME
+- Test bed and extruder heater FETs:
+  - Run `halcmd setp hpg.pwmgen.00.out.*.value 1.0`, where `*` is
+    `00`, `01` or `02` for bed, E0 or E1, respectively
+  - Verify voltage at output
+  - Run `halcmd setp hpg.pwmgen.00.out.*.value 0.0`
+  - Verify 0V at output
 - Test bed and extruder heater thermistors: FIXME
