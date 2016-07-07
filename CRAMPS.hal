@@ -18,23 +18,22 @@ loadusr -w ./setup.sh
 # Core EMC/HAL Loads
 # ###################################
 
-# kinematics
-loadrt trivkins
-
 # motion controller, get name and thread periods from ini file
 # trajectory planner
 loadrt tp
+loadrt trivkins
 loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES tp=tp kins=trivkins
 
-
-# load low-level drivers
+# gpio drivers
 loadrt hal_bb_gpio output_pins=816,822,823,824,825,826,914,921,923,925,941 input_pins=807,808,809,810,817,911,913
-loadrt [PRUCONF](DRIVER) prucode=$(HAL_RTMOD_DIR)/[PRUCONF](PRUBIN) [PRUCONF](CONFIG) halname=hpg
+
+# 10mS PRU driver with 5 stepgens and 4 pwmgens
+loadrt hal_pru_generic prucode=$(HAL_RTMOD_DIR)/xenomai/pru_generic.bin pru=0 num_stepgens=5 num_pwmgens=4 halname=hpg
 setp hpg.pwmgen.00.pwm_period       10000000
 
+# PIDs with input limits for heaters
 loadrt pid count=3
-loadrt limit1 count=2
-
+loadrt limit1 count=3
 
 # Python user-mode HAL module to read ADC value and generate a thermostat output for PWM
 # c = analog input channel and thermistor table
@@ -53,7 +52,7 @@ loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:honeywell_100k_135-104LAG-J01,05:e
 # THREADS
 # ################################################
 
-addf hpg.capture-position   servo-thread
+addf hpg.capture-position                 servo-thread
 addf bb_gpio.read                         servo-thread
 addf motion-command-handler               servo-thread
 addf motion-controller                    servo-thread
@@ -62,6 +61,7 @@ addf pid.1.do-pid-calcs                   servo-thread
 addf pid.2.do-pid-calcs                   servo-thread
 addf limit1.0                             servo-thread
 addf limit1.1                             servo-thread
+addf limit1.2                             servo-thread
 addf hpg.update                           servo-thread
 addf bb_gpio.write                        servo-thread
 
@@ -256,15 +256,17 @@ net limit-z-min => axis.2.neg-lim-sw-in
 
 
 # ################
-# A [3] Axis (MUXed Extruders)
+# A/Extruder [3] Axis
 # ################
 #
-# Extruders should be MUXed; TBD
+# Two extruders are MUXed
 
-# ##########
-# Extruder 1
-#
-# Attached to CRAMPS E0 motor connector with hpg.stepgen.04
+# ################
+# E1/E2 Motor (shared)
+
+# The two extruder motors share hpg.stepgen.04, with the assumption
+# that only one will move at any time.  Step and dir pin parameters
+# will have to be set while running.
 
 # axis enable chain
 newsig emcmot.03.enable bit
@@ -280,7 +282,6 @@ net emcmot.03.pos-cmd => hpg.stepgen.04.position-cmd
 net motor.03.pos-fb <= hpg.stepgen.04.position-fb
 net motor.03.pos-fb => axis.3.motor-pos-fb
 
-
 # timing parameters
 setp hpg.stepgen.04.dirsetup        [AXIS_3]DIRSETUP
 setp hpg.stepgen.04.dirhold         [AXIS_3]DIRHOLD
@@ -293,92 +294,107 @@ setp hpg.stepgen.04.position-scale  [AXIS_3]SCALE
 setp hpg.stepgen.04.maxvel          [AXIS_3]STEPGEN_MAX_VEL
 setp hpg.stepgen.04.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
 
-#setp hpg.stepgen.04.step_type       0
-setp hpg.stepgen.04.steppin        916
-setp hpg.stepgen.04.dirpin         912
+# Multiplex extruders
+sets extruder.select 0
+# E1 motor on P205 E0 motor connector, with step on p9.16 and dir on
+# p9.12
+sets e1.motor.steppin              916
+sets e1.motor.dirpin               912
+# E2 Motor on P206 E1 motor connector, with step on p9.17 and dir on
+# p9.18
+sets e2.motor.steppin              917
+sets e2.motor.dirpin               918
+# Create 2x 2 element multiplexers
+loadrt mux_generic config="uu2,uu2"
+# Step multiplexer on mux-gen.00
+net e1.motor.steppin => mux-gen.00.in-u32-00
+net e2.motor.steppin => mux-gen.00.in-u32-01
+net extruder.select => mux-gen.00.sel-int
+net mux-gen.00.out-u32 => hpg.stepgen.04.steppin
+# Dir multiplexer on mux-gen.01
+net e1.motor.dirpin => mux-gen.01.in-u32-00
+net e2.motor.dirpin => mux-gen.01.in-u32-01
+net extruder.select => mux-gen.01.sel-int
+net mux-gen.01.out-u32 => hpg.stepgen.04.dirpin
 
-# heater
+# ################
+# E1 Heater
+
+# E1 heater signals
 newsig e0.temp.set   float
 newsig e0.temp.meas  float
 
-# E1 heater on FET 2
-setp hpg.pwmgen.00.out.01.pin       915
-setp hpg.pwmgen.00.out.01.enable    1
-setp hpg.pwmgen.00.out.01.value     0.0
-
-# E1 PID
-net e0.temp.meas    <= Therm.ch-05.value
-net e0.temp.meas    => pid.1.feedback
-sets e0.temp.set  0
-net e0.temp.set     => pid.1.command
-
-net e0.heater  <= pid.1.output
-net e0.heater  => limit1.0.in
-net e0.heaterl <= limit1.0.out
-net e0.heaterl => hpg.pwmgen.00.out.01.value
-
-# Limit heater PWM to positive values
-# PWM mimics hm2 implementation, which generates output for negative values
-setp limit1.0.min 0
-
-# PID parameters
+# E1 heater PID 1
 #setp pid.1.FF0      0
 #setp pid.1.FF1      0
 #setp pid.1.FF2      0
-setp pid.1.Pgain  0.30
-setp pid.1.Igain  0.00001
-setp pid.1.Dgain  0.9375
+setp pid.1.Pgain     0.30
+setp pid.1.Igain     0.00001
+setp pid.1.Dgain     0.9375
 setp pid.1.maxerrorI 1.0
-setp pid.1.bias    0.5
-setp pid.1.enable   1
+setp pid.1.bias      0.5
+setp pid.1.enable    1
+# Feedback from P504 THERM 1 = ADC ch. 5
+net e0.temp.meas     Therm.ch-05.value => pid.1.feedback
+sets e0.temp.set     0
+net e0.temp.set      => pid.1.command
+# PID output limited to non-negative values
+setp limit1.1.min    0
+net e0.heater.raw    pid.1.output => limit1.1.in
+net e0.heater        <= limit1.1.out
 
-# E1 Fan FET 4
-newsig e0.fan bit
-net e0.fan => bb_gpio.p9.out-21
+# E1 heater PWM 1
+# output to P405 E0 FET 2 = BBB p9.15
+setp hpg.pwmgen.00.out.01.pin       915
+setp hpg.pwmgen.00.out.01.enable    1
+setp hpg.pwmgen.00.out.01.value     0.0
+# input from PID 1
+net e0.heater => hpg.pwmgen.00.out.01.value
 
-# ##########
-# Extruder 2
-#
-# Attached to CRAMPS E1 motor connector
-#
-# TBD
+################
+# E2 heater FET 3
 
-# axis enable chain
-#net extmux.enable => hpg.stepgen.05.enable
+# E2 heater signals
+newsig e1.temp.set   float
+newsig e1.temp.meas  float
 
-# position command and feedback
-#net extmux.pos-cmd => hpg.stepgen.05.position-cmd
-#net extmux.pos-fb <= hpg.stepgen.05.position-fb
+# E2 heater PID 2
+#setp pid.2.FF0      0
+#setp pid.2.FF1      0
+#setp pid.2.FF2      0
+setp pid.2.Pgain     0.30
+setp pid.2.Igain     0.00001
+setp pid.2.Dgain     0.9375
+setp pid.2.maxerrorI 1.0
+setp pid.2.bias      0.5
+setp pid.2.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
+# Feedback from P504 THERM 2 = ADC ch. 6
+net e1.temp.meas     Therm.ch-06.value => pid.2.feedback
+sets e1.temp.set     0
+net e1.temp.set      => pid.2.command
+# PID output limited to non-negative values
+setp limit1.2.min    0
+net e1.heater.raw    pid.2.output => limit1.2.in
+net e1.heater        <= limit1.2.out
 
-# timing parameters
-#setp hpg.stepgen.05.dirsetup        [AXIS_3]DIRSETUP
-#setp hpg.stepgen.05.dirhold         [AXIS_3]DIRHOLD
+# E2 heater PWM 2
+# output to P406 E1 FET 3 = BBB p9.27
+setp hpg.pwmgen.00.out.02.pin       927
+setp hpg.pwmgen.00.out.02.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
+setp hpg.pwmgen.00.out.02.value     0.0
 
-#setp hpg.stepgen.05.steplen         [AXIS_3]STEPLEN
-#setp hpg.stepgen.05.stepspace       [AXIS_3]STEPSPACE
+# ################
+# Extruder Fan
 
-#setp hpg.stepgen.05.position-scale  [AXIS_3]SCALE
+newsig fan.speed.set float
+sets fan.speed.set 0
 
-#setp hpg.stepgen.05.maxvel          [AXIS_3]STEPGEN_MAX_VEL
-#setp hpg.stepgen.05.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
-
-#setp hpg.stepgen.05.step_type       0
-#setp hpg.stepgen.05.steppin        917
-#setp hpg.stepgen.05.dirpin         918
-
-# # heater
-# newsig e0.temp.set   float
-# newsig e0.temp.meas  float
-
-# # E2 Heater FET 3
-# setp hpg.pwmgen.00.out.02.pin       927
-# setp hpg.pwmgen.00.out.02.enable    1
-# setp hpg.pwmgen.00.out.02.value     0.0
-# [...]
-
-# E2 Fan FET 5
-newsig e2.fan bit
-net e2.fan => bb_gpio.p9.out-41
+# output to P408 E2 FET 4 = BBB p9.21
+setp hpg.pwmgen.00.out.04.pin       921
+# Arduino fan values in 0-255
+setp hpg.pwmgen.00.out.04.scale     255
+setp hpg.pwmgen.00.out.04.enable    1
+net fan.speed.set => hpg.pwmgen.00.out.04.value
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -413,43 +429,35 @@ net emcmot.00.enable => bb_gpio.p9.out-25
 # Heated Bed
 # ##################################################
 
+# Heater signals
 # Define signals to use elsewhere (ie: M1xx codes)
 # If you change any names here, lots of things will break!
 newsig bed.temp.set  float
 newsig bed.temp.meas float
 
-
-# Bed Heater FET 1
-setp hpg.pwmgen.00.out.00.pin       811
-setp hpg.pwmgen.00.out.00.enable    1
-setp hpg.pwmgen.00.out.00.value     0.0
-
-# PID for Bed temperature control
-net bed.temp.meas    <= Therm.ch-04.value
-net bed.temp.meas    => pid.0.feedback
-
-sets bed.temp.set  0
-net bed.temp.set     => pid.0.command
-
-net bed.heater  <= pid.0.output
-net bed.heater  => limit1.1.in
-net bed.heaterl <= limit1.1.out
-net bed.heaterl => hpg.pwmgen.00.out.00.value
-
-# Limit heater PWM to positive values
-# PWM mimics hm2 implementation, which generates output for negative values
-setp limit1.1.min 0
-
-# PID Parameters for adjusting temperature control
-# Bed
+# Bed heater PID 0
 #setp pid.0.FF0      0
 #setp pid.0.FF1      0
 #setp pid.0.FF2      0
-setp pid.0.Pgain  1
-setp pid.0.Igain  0.0
-setp pid.0.Dgain  0.0
+setp pid.0.Pgain     1
+setp pid.0.Igain     0.0
+setp pid.0.Dgain     0.0
 setp pid.0.maxerrorI 1.0
-setp pid.0.bias    0.5
-setp pid.0.enable   1
+setp pid.0.bias      0.5
+setp pid.0.enable    1
+# Feedback from P504 THERM 0 = ADC ch. 4
+net bed.temp.meas    Therm.ch-04.value => pid.0.feedback
+sets bed.temp.set    0
+net bed.temp.set     => pid.0.command
+# PID output limited to non-negative values
+setp limit1.0.min    0
+net bed.heater.raw   pid.0.output => limit1.0.in
+net bed.heater       <= limit1.0.out
 
-
+# Bed Heater PWM 0
+# output to P401 Bed Heater FET 1 = BBB p8.11
+setp hpg.pwmgen.00.out.00.pin       811
+setp hpg.pwmgen.00.out.00.enable    1
+setp hpg.pwmgen.00.out.00.value     0.0
+# input from PID 0
+net bed.heater       => hpg.pwmgen.00.out.00.value
