@@ -289,7 +289,7 @@ setp hpg.stepgen.04.dirhold         [AXIS_3]DIRHOLD
 setp hpg.stepgen.04.steplen         [AXIS_3]STEPLEN
 setp hpg.stepgen.04.stepspace       [AXIS_3]STEPSPACE
 
-setp hpg.stepgen.04.position-scale  [AXIS_3]SCALE
+# `hpg.stepgen.04.position-scale` multiplexed below
 
 setp hpg.stepgen.04.maxvel          [AXIS_3]STEPGEN_MAX_VEL
 setp hpg.stepgen.04.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
@@ -300,12 +300,14 @@ sets extruder.select 0
 # p9.12
 sets e1.motor.steppin              916
 sets e1.motor.dirpin               912
+sets e1.motor.esteps               [TAZ_5]E1_ESTEPS
 # E2 Motor on P206 E1 motor connector, with step on p9.17 and dir on
 # p9.18
 sets e2.motor.steppin              917
 sets e2.motor.dirpin               918
-# Create 2x 2 element multiplexers
-loadrt mux_generic config="uu2,uu2"
+sets e2.motor.esteps               [TAZ_5]E2_ESTEPS
+# Create 3x 2 element multiplexers
+loadrt mux_generic config="uu2,uu2,uu2"
 # Step multiplexer on mux-gen.00
 net e1.motor.steppin => mux-gen.00.in-u32-00
 net e2.motor.steppin => mux-gen.00.in-u32-01
@@ -316,6 +318,11 @@ net e1.motor.dirpin => mux-gen.01.in-u32-00
 net e2.motor.dirpin => mux-gen.01.in-u32-01
 net extruder.select => mux-gen.01.sel-int
 net mux-gen.01.out-u32 => hpg.stepgen.04.dirpin
+# E steps multiplexer on mux-gen.02
+net e1.motor.esteps => mux-gen.02.in-u32-00
+net e2.motor.esteps => mux-gen.02.in-u32-01
+net extruder.select => mux-gen.02.sel-int
+net mux-gen.02.out-u32 => hpg.stepgen.04.position-scale
 
 # ################
 # E1 Heater
