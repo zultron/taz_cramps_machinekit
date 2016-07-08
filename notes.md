@@ -35,6 +35,52 @@ From [flexydually OHAI][fd-ohai]:
 [rro-gcode]: http://reprap.org/wiki/G-code
 [ds-mcodes]: https://github.com/Arcus-3d/Arcus-3D-M1
 
+# Notes from TAZ configuration
+- From the [TAZ firmware][TAZ-fw], `Marlin/Configuration.h`
+- Heater limits:
+  - They set e.g. `HEATER_0_MINTEMP` to 5, below which assume
+    thermistor short/failure, and heater is disabled
+  - `HEATER_0_MAXTEMP` is 250, then heater shut off; prevents
+    accidental overheating
+- Extruder PID terms:
+  - Preset for 24V Buda 2.0:  Kp 6, Ki .3, Kd 125
+  - `PID_MAX` 74; limits current to nozzle while PID is active (see
+    `PID_FUNCTIONAL_RANGE` below); 255=full current
+  - `PID_FUNCTIONAL_RANGE` 16; if the temperature difference between
+    the target temperature and the actual temperature is more then
+    `PID_FUNCTIONAL_RANGE` then the PID will be shut off and the
+    heater will be set to min/max.
+  - `PID_INTEGRAL_DRIVE_MAX` 70; limit for the integral term
+  - `K1` 0.96; smoothing factor within the PID
+  - `PID_dT` `((OVERSAMPLENR * 8.0)/(F_CPU / 64.0 / 256.0))` sampling
+    period of the temperature routine
+  - `EXTRUDE_MINTEMP` 120
+- Bed PID terms:
+  - Presets for 24V 360W silicone heater from NPH on 3mm borosilicate
+    (TAZ 2.2+)
+  - `MAX_BED_POWER` 206; limits duty cycle to bed; 255=full current
+  - `DEFAULT_bedKp` 20; `DEFAULT_bedKi` 5; `DEFAULT_bedKd` 275
+- Geometry:
+  - `X_MAX_POS` 298; `Y_MAX_POS` 275; `Z_MAX_POS` 250
+- Good stuff about auto bed leveling
+- Homing speeds, mm/min:  50*60, 50*60, 8*60
+- Axis steps per unit:   100.5,100.5,1600,850
+- Max feedrate, mm/S:  800, 800, 8, 50
+- Max accel:  9000,9000,100,10000 "max start speed for accelerated moves"
+- Default accel:  500 mm/S^2 all joins max accel for printing moves
+- Default retract accel:  3000 mm/S^2 max accel for retracts
+- Offset of extruders, mm, X,Y:  E0 0,0; E1 0, -52
+- Default jerk, mm/S: XY 8.0; Z 0.4; E 10.0; The speed change that
+  does not require acceleration (i.e. the software might assume it can
+  be done instantaneously)
+- Preheat constants:
+  - PLA:  hotend temp 180; hpb temp 50; fan speed 0/255;
+  - ABS:  hotend temp 230; hpb temp 85; fan speed 0/255;
+- More stuff in `Configuration_adv.h`
+- Also `thermistortables.h`
+
+[TAZ-fw]: http://devel.lulzbot.com/TAZ/Holly/software/2014Q3_rB/Marlin/Marlin-2014Q3_rB.tar
+
 # INI file
 INI [docs][1]
 
