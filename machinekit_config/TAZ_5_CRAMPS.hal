@@ -35,18 +35,17 @@ setp hpg.pwmgen.00.pwm_period       10000000
 loadrt pid count=3
 loadrt limit1 count=3
 
-# Python user-mode HAL module to read ADC value and generate a thermostat output for PWM
-# c = analog input channel and thermistor table
+# Thermistor ADC values for PWM
 #
-# The Hexagon Hot End thermistor [1] is a EPCOS 100k [2], not the same
-# as the 24V silicone heater [3] that uses a Honeywell 100k [4], [5].
+# 24V silicone heater [3]: Honeywell 100k [4], [5]
+# Hexagon Hot End thermistor [1]: EPCOS 100k [2]
 #    
 # [1]: https://www.lulzbot.com/store/parts/100k-epcos-thermistor
 # [2]: http://www.epcos.com/inf/50/db/ntc_09/Glass_enc_Sensors__B57560__G560__G1560.pdf
 # [3]: https://www.lulzbot.com/store/parts/24v-silicone-heater
 # [4]: https://www.lulzbot.com/store/parts/100k-honeywell-axial-thermistor
 # [5]: http://media.digikey.com/pdf/Data%20Sheets/Honeywell%20Sensing%20&%20Control%20PDFs/135-104LAG-J01.pdf
-loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:honeywell_100k_135-104LAG-J01,05:epcos_B57560G1104,06:epcos_B57560G1104 -b CRAMPS
+loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:epcos_B57560G1104,05:epcos_B57560G1104,06:honeywell_100k_135-104LAG-J01 -b CRAMPS
 
 # ################################################
 # THREADS
@@ -262,9 +261,9 @@ net limit-z-min => axis.2.neg-lim-sw-in
 # Two extruders are MUXed
 
 # ################
-# E1/E2 Motor (shared)
+# E0/E1 Motor (shared)
 
-# The two extruder motors share hpg.stepgen.04, with the assumption
+# The two extruder motors share hpg.stepgen.04 under the assumption
 # that only one will move at any time.  Step and dir pin parameters
 # will have to be set while running.
 
@@ -296,40 +295,74 @@ setp hpg.stepgen.04.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
 
 # Multiplex extruders
 sets extruder.select 0
-# E1 motor on P205 E0 motor connector, with step on p9.16 and dir on
+# E0 motor on P205 E0 motor connector, with step on p9.16 and dir on
 # p9.12
-sets e1.motor.steppin              916
-sets e1.motor.dirpin               912
-sets e1.motor.esteps               [TAZ_5]E1_ESTEPS
-# E2 Motor on P206 E1 motor connector, with step on p9.17 and dir on
+sets e0.motor.steppin              916
+sets e0.motor.dirpin               912
+sets e0.motor.esteps               [TAZ_5]E0_ESTEPS
+# E1 Motor on P206 E1 motor connector, with step on p9.17 and dir on
 # p9.18
-sets e2.motor.steppin              917
-sets e2.motor.dirpin               918
-sets e2.motor.esteps               [TAZ_5]E2_ESTEPS
+sets e1.motor.steppin              917
+sets e1.motor.dirpin               918
+sets e1.motor.esteps               [TAZ_5]E1_ESTEPS
 # Create 3x 2 element multiplexers
 loadrt mux_generic config="uu2,uu2,uu2"
 # Step multiplexer on mux-gen.00
-net e1.motor.steppin => mux-gen.00.in-u32-00
-net e2.motor.steppin => mux-gen.00.in-u32-01
+net e0.motor.steppin => mux-gen.00.in-u32-00
+net e1.motor.steppin => mux-gen.00.in-u32-01
 net extruder.select => mux-gen.00.sel-int
 net mux-gen.00.out-u32 => hpg.stepgen.04.steppin
 # Dir multiplexer on mux-gen.01
-net e1.motor.dirpin => mux-gen.01.in-u32-00
-net e2.motor.dirpin => mux-gen.01.in-u32-01
+net e0.motor.dirpin => mux-gen.01.in-u32-00
+net e1.motor.dirpin => mux-gen.01.in-u32-01
 net extruder.select => mux-gen.01.sel-int
 net mux-gen.01.out-u32 => hpg.stepgen.04.dirpin
 # E steps multiplexer on mux-gen.02
-net e1.motor.esteps => mux-gen.02.in-u32-00
-net e2.motor.esteps => mux-gen.02.in-u32-01
+net e0.motor.esteps => mux-gen.02.in-u32-00
+net e1.motor.esteps => mux-gen.02.in-u32-01
 net extruder.select => mux-gen.02.sel-int
 net mux-gen.02.out-u32 => hpg.stepgen.04.position-scale
 
 # ################
-# E1 Heater
+# E0 Heater
 
-# E1 heater signals
+# E0 heater signals
 newsig e0.temp.set   float
 newsig e0.temp.meas  float
+
+# E0 heater PID 0
+#setp pid.0.FF0      0
+#setp pid.0.FF1      0
+#setp pid.0.FF2      0
+setp pid.0.Pgain     0.30
+setp pid.0.Igain     0.00001
+setp pid.0.Dgain     0.9375
+setp pid.0.maxerrorI 1.0
+setp pid.0.bias      0.5
+setp pid.0.enable    1
+# Feedback from P504 THERM 0 = ADC ch. 4
+net e0.temp.meas     Therm.ch-04.value => pid.0.feedback
+sets e0.temp.set     0
+net e0.temp.set      => pid.0.command
+# PID output limited to non-negative values
+setp limit1.0.min    0
+net e0.heater.raw    pid.0.output => limit1.0.in
+net e0.heater        <= limit1.0.out
+
+# E0 heater PWM 0
+# output to P405 E0 FET 2 = BBB p9.15
+setp hpg.pwmgen.00.out.00.pin       915
+setp hpg.pwmgen.00.out.00.enable    1
+setp hpg.pwmgen.00.out.00.value     0.0
+# input from PID 1
+net e0.heater => hpg.pwmgen.00.out.00.value
+
+################
+# E1 heater FET 3
+
+# E1 heater signals
+newsig e1.temp.set   float
+newsig e1.temp.meas  float
 
 # E1 heater PID 1
 #setp pid.1.FF0      0
@@ -340,55 +373,21 @@ setp pid.1.Igain     0.00001
 setp pid.1.Dgain     0.9375
 setp pid.1.maxerrorI 1.0
 setp pid.1.bias      0.5
-setp pid.1.enable    1
+setp pid.1.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
 # Feedback from P504 THERM 1 = ADC ch. 5
-net e0.temp.meas     Therm.ch-05.value => pid.1.feedback
-sets e0.temp.set     0
-net e0.temp.set      => pid.1.command
+net e1.temp.meas     Therm.ch-05.value => pid.1.feedback
+sets e1.temp.set     0
+net e1.temp.set      => pid.1.command
 # PID output limited to non-negative values
 setp limit1.1.min    0
-net e0.heater.raw    pid.1.output => limit1.1.in
-net e0.heater        <= limit1.1.out
+net e1.heater.raw    pid.1.output => limit1.1.in
+net e1.heater        <= limit1.1.out
 
 # E1 heater PWM 1
-# output to P405 E0 FET 2 = BBB p9.15
-setp hpg.pwmgen.00.out.01.pin       915
-setp hpg.pwmgen.00.out.01.enable    1
-setp hpg.pwmgen.00.out.01.value     0.0
-# input from PID 1
-net e0.heater => hpg.pwmgen.00.out.01.value
-
-################
-# E2 heater FET 3
-
-# E2 heater signals
-newsig e1.temp.set   float
-newsig e1.temp.meas  float
-
-# E2 heater PID 2
-#setp pid.2.FF0      0
-#setp pid.2.FF1      0
-#setp pid.2.FF2      0
-setp pid.2.Pgain     0.30
-setp pid.2.Igain     0.00001
-setp pid.2.Dgain     0.9375
-setp pid.2.maxerrorI 1.0
-setp pid.2.bias      0.5
-setp pid.2.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
-# Feedback from P504 THERM 2 = ADC ch. 6
-net e1.temp.meas     Therm.ch-06.value => pid.2.feedback
-sets e1.temp.set     0
-net e1.temp.set      => pid.2.command
-# PID output limited to non-negative values
-setp limit1.2.min    0
-net e1.heater.raw    pid.2.output => limit1.2.in
-net e1.heater        <= limit1.2.out
-
-# E2 heater PWM 2
 # output to P406 E1 FET 3 = BBB p9.27
-setp hpg.pwmgen.00.out.02.pin       927
-setp hpg.pwmgen.00.out.02.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
-setp hpg.pwmgen.00.out.02.value     0.0
+setp hpg.pwmgen.00.out.01.pin       927
+setp hpg.pwmgen.00.out.01.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
+setp hpg.pwmgen.00.out.01.value     0.0
 
 # ################
 # Extruder Fan
@@ -396,12 +395,12 @@ setp hpg.pwmgen.00.out.02.value     0.0
 newsig fan.speed.set float
 sets fan.speed.set 0
 
-# output to P408 E2 FET 4 = BBB p9.21
-setp hpg.pwmgen.00.out.04.pin       921
+# PWM 2 output to P408 E2 FET 4 = BBB p9.21
+setp hpg.pwmgen.00.out.02.pin       921
 # Arduino fan values in 0-255
-setp hpg.pwmgen.00.out.04.scale     255
-setp hpg.pwmgen.00.out.04.enable    1
-net fan.speed.set => hpg.pwmgen.00.out.04.value
+setp hpg.pwmgen.00.out.02.scale     255
+setp hpg.pwmgen.00.out.02.enable    1
+net fan.speed.set => hpg.pwmgen.00.out.02.value
 
 # ##################################################
 # Standard I/O - EStop, Enables, Limit Switches, Etc
@@ -442,29 +441,29 @@ net emcmot.00.enable => bb_gpio.p9.out-25
 newsig bed.temp.set  float
 newsig bed.temp.meas float
 
-# Bed heater PID 0
-#setp pid.0.FF0      0
-#setp pid.0.FF1      0
-#setp pid.0.FF2      0
-setp pid.0.Pgain     1
-setp pid.0.Igain     0.0
-setp pid.0.Dgain     0.0
-setp pid.0.maxerrorI 1.0
-setp pid.0.bias      0.5
-setp pid.0.enable    1
-# Feedback from P504 THERM 0 = ADC ch. 4
-net bed.temp.meas    Therm.ch-04.value => pid.0.feedback
+# Bed heater PID 2
+#setp pid.2.FF0      0
+#setp pid.2.FF1      0
+#setp pid.2.FF2      0
+setp pid.2.Pgain     1
+setp pid.2.Igain     0.0
+setp pid.2.Dgain     0.0
+setp pid.2.maxerrorI 1.0
+setp pid.2.bias      0.5
+setp pid.2.enable    1
+# Feedback from P504 THERM 2 = ADC ch. 6
+net bed.temp.meas    Therm.ch-06.value => pid.2.feedback
 sets bed.temp.set    0
-net bed.temp.set     => pid.0.command
+net bed.temp.set     => pid.2.command
 # PID output limited to non-negative values
-setp limit1.0.min    0
-net bed.heater.raw   pid.0.output => limit1.0.in
-net bed.heater       <= limit1.0.out
+setp limit1.2.min    0
+net bed.heater.raw   pid.2.output => limit1.2.in
+net bed.heater       <= limit1.2.out
 
-# Bed Heater PWM 0
+# Bed Heater PWM 3
 # output to P401 Bed Heater FET 1 = BBB p8.11
-setp hpg.pwmgen.00.out.00.pin       811
-setp hpg.pwmgen.00.out.00.enable    1
-setp hpg.pwmgen.00.out.00.value     0.0
-# input from PID 0
-net bed.heater       => hpg.pwmgen.00.out.00.value
+setp hpg.pwmgen.00.out.03.pin       811
+setp hpg.pwmgen.00.out.03.enable    1
+setp hpg.pwmgen.00.out.03.value     0.0
+# input from PID 2
+net bed.heater       => hpg.pwmgen.00.out.03.value
