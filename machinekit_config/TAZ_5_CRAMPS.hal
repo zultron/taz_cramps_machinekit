@@ -101,8 +101,8 @@ setp hpg.stepgen.00.stepspace       [AXIS_0]STEPSPACE
 setp hpg.stepgen.00.position-scale  [AXIS_0]SCALE
 setp hpg.stepgen.00.maxvel          [AXIS_0]STEPGEN_MAX_VEL
 setp hpg.stepgen.00.maxaccel        [AXIS_0]STEPGEN_MAX_ACC
-setp hpg.stepgen.00.steppin         813
-setp hpg.stepgen.00.dirpin          812
+setp hpg.stepgen.00.steppin         813 # 0x32D
+setp hpg.stepgen.00.dirpin          812 # 0x32C
 
 # Limit switch
 net limit-x-min                     <= bb_gpio.p8.in-08
@@ -138,8 +138,8 @@ setp hpg.stepgen.01.stepspace       [AXIS_1]STEPSPACE
 setp hpg.stepgen.01.position-scale  [AXIS_1]SCALE
 setp hpg.stepgen.01.maxvel          [AXIS_1]STEPGEN_MAX_VEL
 setp hpg.stepgen.01.maxaccel        [AXIS_1]STEPGEN_MAX_ACC
-setp hpg.stepgen.01.steppin         815
-setp hpg.stepgen.01.dirpin          814
+setp hpg.stepgen.01.steppin         815 # 0x32F
+setp hpg.stepgen.01.dirpin          814 # 0x32E
 
 # Limit switch
 net limit-y-min                     <= bb_gpio.p8.in-10
@@ -182,8 +182,8 @@ setp hpg.stepgen.02.stepspace       [AXIS_2]STEPSPACE
 setp hpg.stepgen.02.position-scale  [AXIS_2]SCALE
 setp hpg.stepgen.02.maxvel          [AXIS_2]STEPGEN_MAX_VEL
 setp hpg.stepgen.02.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
-setp hpg.stepgen.02.steppin         819
-setp hpg.stepgen.02.dirpin          818
+setp hpg.stepgen.02.steppin         819 # 0x333
+setp hpg.stepgen.02.dirpin          818 # 0x332
 
 # Left motor parameters
 setp hpg.stepgen.03.dirsetup        [AXIS_2]DIRSETUP
@@ -193,8 +193,8 @@ setp hpg.stepgen.03.stepspace       [AXIS_2]STEPSPACE
 setp hpg.stepgen.03.position-scale  [AXIS_2]SCALE
 setp hpg.stepgen.03.maxvel          [AXIS_2]STEPGEN_MAX_VEL
 setp hpg.stepgen.03.maxaccel        [AXIS_2]STEPGEN_MAX_ACC
-setp hpg.stepgen.03.steppin         924
-setp hpg.stepgen.03.dirpin          926
+setp hpg.stepgen.03.steppin         924 # 0x39C
+setp hpg.stepgen.03.dirpin          926 # 0x39E
 
 # Limit switch
 net limit-z-min                     <= bb_gpio.p9.in-13
@@ -241,29 +241,29 @@ setp hpg.stepgen.04.stepspace       [AXIS_3]STEPSPACE
 setp hpg.stepgen.04.maxvel          [AXIS_3]STEPGEN_MAX_VEL
 setp hpg.stepgen.04.maxaccel        [AXIS_3]STEPGEN_MAX_ACC
 # E steps multiplexer on mux-gen.02
+net extruder.select                 => mux-gen.02.sel-int
 net e0.motor.esteps                 => mux-gen.02.in-float-00
 net e1.motor.esteps                 => mux-gen.02.in-float-01
-net extruder.select                 => mux-gen.02.sel-int
 net extruder.esteps                 => hpg.stepgen.04.position-scale
 sets extruder.esteps                [TAZ_5](E0_ESTEPS)
 net extruder.esteps                 <= mux-gen.02.out-float
 sets e0.motor.esteps                [TAZ_5](E0_ESTEPS)
 sets e1.motor.esteps                [TAZ_5](E1_ESTEPS)
 # step multiplexer on mux-gen.00
+net extruder.select                 => mux-gen.00.sel-int
 net e0.motor.steppin                => mux-gen.00.in-u32-00
 net e1.motor.steppin                => mux-gen.00.in-u32-01
-net extruder.select                 => mux-gen.00.sel-int
-net extruder.step                   mux-gen.00.out-u32 => hpg.stepgen.04.steppin
-sets e0.motor.steppin               916
-sets e1.motor.steppin               917
+net extruder.steppin                mux-gen.00.out-u32 => hpg.stepgen.04.steppin
+sets e0.motor.steppin               916 # 0x394
+sets e1.motor.steppin               917 # 0x395
 # Dir multiplexer on mux-gen.01
+net extruder.select                 => mux-gen.01.sel-int
 net e0.motor.dirpin                 => mux-gen.01.in-u32-00
 net e1.motor.dirpin                 => mux-gen.01.in-u32-01
-net extruder.select                 => mux-gen.01.sel-int
-net extruder.dir                    mux-gen.01.out-u32 => hpg.stepgen.04.dirpin
-sets e0.motor.dirpin                912
-sets e1.motor.dirpin                918
-# Start with default extruder 0
+net extruder.dirpin                 mux-gen.01.out-u32 => hpg.stepgen.04.dirpin
+sets e0.motor.dirpin                912 # 0x390
+sets e1.motor.dirpin                918 # 0x396
+# Set default extruder
 sets extruder.select                0
 
 # ################
@@ -299,7 +299,7 @@ net e0.heater                       => hpg.pwmgen.00.out.00.value
 # PWM params
 setp hpg.pwmgen.00.out.00.enable    1
 # PWM output
-setp hpg.pwmgen.00.out.00.pin       915
+setp hpg.pwmgen.00.out.00.pin       915 # 0x393
 
 # ################
 # E1 heater
@@ -334,7 +334,7 @@ net e1.heater                       => hpg.pwmgen.00.out.01.value
 # PWM params
 setp hpg.pwmgen.00.out.01.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
 # PWM output
-setp hpg.pwmgen.00.out.01.pin       927
+setp hpg.pwmgen.00.out.01.pin       927 # 0x39F
 
 
 # ################
@@ -353,7 +353,7 @@ sets fan.speed.set                  0
 setp hpg.pwmgen.00.out.02.enable    1
 setp hpg.pwmgen.00.out.02.scale     255
 # PWM output
-setp hpg.pwmgen.00.out.02.pin       921
+setp hpg.pwmgen.00.out.02.pin       921 # 0x399
 
 
 # ##################################################
@@ -389,7 +389,7 @@ net bed.heater                      => hpg.pwmgen.00.out.03.value
 # PWM params
 setp hpg.pwmgen.00.out.03.enable    1
 # PWM output
-setp hpg.pwmgen.00.out.03.pin       811
+setp hpg.pwmgen.00.out.03.pin       811 # 0x32B
 
 
 # ##################################################
