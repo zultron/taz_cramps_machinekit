@@ -38,8 +38,9 @@ setp hpg.pwmgen.00.pwm_period       10000000
 loadrt pid count=3
 loadrt limit1 count=3
 
-# Multiplexers for dual extruder
+# Multiplexers and logic for dual extruder
 loadrt mux_generic config="uu2,uu2,ff2"
+loadrt and2 count=1
 
 # Thermistor ADC values for PWM
 #
@@ -70,6 +71,7 @@ addf limit1.2                       servo-thread
 addf mux-gen.00                     servo-thread
 addf mux-gen.01                     servo-thread
 addf mux-gen.02                     servo-thread
+addf and2.0                         servo-thread
 addf hpg.update                     servo-thread
 addf bb_gpio.write                  servo-thread
 
@@ -204,6 +206,16 @@ net limit-z-min                     => axis.2.neg-lim-sw-in
 
 
 # ################
+# E1 enable logic
+# ################
+
+# Logically 'and' .ini file param and motion enable to e1.enable signal
+net e1.ini.enable                   => and2.0.in0
+sets e1.ini.enable                  [TAZ_5]DUAL_EXTRUDER_ENABLE
+net emcmot.00.enable                => and2.0.in1
+net e1.enable                       <= and2.0.out
+
+# ################
 # A/Extruder [3] Axis
 # ################
 
@@ -287,7 +299,7 @@ setp pid.0.Igain                    0.00001
 setp pid.0.Dgain                    0.9375
 setp pid.0.maxerrorI                1.0
 setp pid.0.bias                     0.5
-setp pid.0.enable                   1
+net emcmot.00.enable                => pid.0.enable
 # PID output limited to non-negative values
 setp limit1.0.min                   0
 net e0.heater.raw                   pid.0.output => limit1.0.in
@@ -297,7 +309,7 @@ net e0.heater                       <= limit1.0.out
 setp hpg.pwmgen.00.out.00.value     0.0
 net e0.heater                       => hpg.pwmgen.00.out.00.value
 # PWM params
-setp hpg.pwmgen.00.out.00.enable    1
+net emcmot.00.enable                => hpg.pwmgen.00.out.00.enable
 # PWM output
 setp hpg.pwmgen.00.out.00.pin       915 # 0x393
 
@@ -322,7 +334,7 @@ setp pid.1.Igain                    0.00001
 setp pid.1.Dgain                    0.9375
 setp pid.1.maxerrorI                1.0
 setp pid.1.bias                     0.5
-setp pid.1.enable                   [TAZ_5]DUAL_EXTRUDER_ENABLE
+net e1.enable                       => pid.1.enable
 # PID output limited to non-negative values
 setp limit1.1.min                   0
 net e1.heater.raw                   pid.1.output => limit1.1.in
@@ -332,7 +344,7 @@ net e1.heater                       <= limit1.1.out
 setp hpg.pwmgen.00.out.01.value     0.0
 net e1.heater                       => hpg.pwmgen.00.out.01.value
 # PWM params
-setp hpg.pwmgen.00.out.01.enable    [TAZ_5]DUAL_EXTRUDER_ENABLE
+net e1.enable                       => hpg.pwmgen.00.out.01.enable
 # PWM output
 setp hpg.pwmgen.00.out.01.pin       927 # 0x39F
 
@@ -350,7 +362,7 @@ setp hpg.pwmgen.00.out.02.value     0.0
 net fan.speed.set                   => hpg.pwmgen.00.out.02.value
 sets fan.speed.set                  0
 # PWM params
-setp hpg.pwmgen.00.out.02.enable    1
+net emcmot.00.enable                => hpg.pwmgen.00.out.02.enable
 setp hpg.pwmgen.00.out.02.scale     255
 # PWM output
 setp hpg.pwmgen.00.out.02.pin       921 # 0x399
@@ -387,7 +399,7 @@ net bed.heater                      <= limit1.2.out
 setp hpg.pwmgen.00.out.03.value     0.0
 net bed.heater                      => hpg.pwmgen.00.out.03.value
 # PWM params
-setp hpg.pwmgen.00.out.03.enable    1
+net emcmot.00.enable                => hpg.pwmgen.00.out.03.enable
 # PWM output
 setp hpg.pwmgen.00.out.03.pin       811 # 0x32B
 
