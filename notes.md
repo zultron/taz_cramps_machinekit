@@ -18,6 +18,16 @@ From [flexydually OHAI][fd-ohai]:
   - `M107` is fan off (deprecated)
   - PWM period [may matter][fan-pwm]
   
+After testing:
+- Using one stepgen for both motors doesn't work; switching the
+  extruder causes a 'joint following error'
+- Instead, we probably need two stepgens wired to look like one to
+  motion:
+  - Two `position-fb` pins are added before going into `motor-pos-fb`
+  - The deselected motor `position-cmd` input must be locked, and the
+    difference of that and `motor-pos-cmd` coming out must be passed
+    into the active `position-cmd` input
+  - Probably needs a custom comp.
 
 [fd-ohai]: https://ohai.lulzbot.com/project/lulzbot-taz-flexydually-tool-head-v2-installation/accessories/
 [duallie]: http://devel.lulzbot.com/TAZ/accessories/javelin/
@@ -117,19 +127,37 @@ From [flexydually OHAI][fd-ohai]:
 
 ## Connector diagram
 
-             +-+ Large notch
-		  3 X X X 1
-		 7 X X X X 4
-		11 X X X X 8
-		 13 X X X 12
-
+        Enclosure connector layouts
         Rear:        Top:
-		+-----+      +-----+
-		| X   | XZ   | X   | Ext1
-		|   X | YZ   | X   | Ext2
-		| x   | Bed  |   | |
-		|   x | Pwr  |   | |
-		+-----+      +-----+
+        +-----+      +-----+
+        | X   | XZ   | X   | Ext1
+        |   X | YZ   | X   | Ext2
+        | x   | Bed  |   | | D Sub
+        |   o | Pwr  |   | | (Empty)
+        +-----+      +-----+
+
+        Large 'X' connector pin numbering
+             +-+ Large notch
+          3 X X X 1
+         7 X X X X 4
+        11 X X X X 8
+         13 X X X 12
+
+        Small 'x' connector pin numbering
+           +-+ Large notch
+          1 X
+         3 X X 2
+          4 X
+
+        Pololu header pin numbering
+        1 .    . 16
+          .    .
+          .    .    .
+          .    .  | . (Motor conn.)
+          .    .  | .
+          .    .    .
+          .    .
+        8 .    . 9
 
 ## Power continuity
 - Unplug power and printer
@@ -191,11 +219,15 @@ From [flexydually OHAI][fd-ohai]:
     `Z` or `A`
   - Put a volt meter on `DIR` pin 8 for the CRAMPS Pololu connector
     corresponding to the axis:  `X` = `X`; `Y` = `Y`; `Z` = `Z` and
-    `E2`; `A` = `E0` (`E1` not yet enabled)
+    `E2`; `A` = extruder (see below); use any ground, or pin 9
   - With the jog increment set to continuous, jog with the `+` and `-`
     buttons, verifying the voltage goes between 0V and 3.3V
   - Put the volt meter on the `Step` pin 7, and verify the voltage
-    increases some small amount above 0V
+    increases some small amount above 0V; try increasing the "Jog
+    Speed" slider for better results
+  - For the `A` axis, test as above for the default `E0` pololu socket
+    first; then run `halcmd sets extruder.select 1` and repeat for the
+    `E1` socket
 - Test ESTOP:
   - Remove the shunt from CRAMPS `ESTOP` connector P302; verify that
     the machine has reset in Axis; verify the CRAMPS `ESTOP` LED
