@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <pyvcp>
 
-  <!-- ----------- E0 ----------- -->
+  <!-- +++++++++++++ E0 +++++++++++++ -->
   <hbox>
     <label>
       <text>"Extruder 0 Temp:"</text>
@@ -17,7 +17,7 @@
     <max_>300</max_>
   </bar>
 
-  <!-- ----------- E1 ----------- -->
+  <!-- +++++++++++++ E1 +++++++++++++ -->
   <hbox>
     <label>
       <text>"Extruder 1 Temp:"</text>
@@ -33,19 +33,19 @@
     <max_>300</max_>
   </bar>
 
-  <!-- ----------- Bed ----------- -->
+  <!-- +++++++++++++ Bed +++++++++++++ -->
   <hbox>
     <label>
       <text>"Bed Temp:"</text>
     </label>
     <number>
-      <halpin>"Bed.Temp.set"</halpin>
+      <halpin>"bed.temp.set"</halpin>
       <format>"3.1f"</format>
     </number>
   </hbox>
 
   <bar>
-    <halpin>"Bed.Temp"</halpin>
+    <halpin>"bed.temp.meas"</halpin>
     <max_>300</max_>
   </bar>
 

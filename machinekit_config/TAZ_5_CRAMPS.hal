@@ -52,7 +52,7 @@ loadrt and2 count=1
 # [3]: https://www.lulzbot.com/store/parts/24v-silicone-heater
 # [4]: https://www.lulzbot.com/store/parts/100k-honeywell-axial-thermistor
 # [5]: http://media.digikey.com/pdf/Data%20Sheets/Honeywell%20Sensing%20&%20Control%20PDFs/135-104LAG-J01.pdf
-loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:epcos_B57560G1104,05:epcos_B57560G1104,06:honeywell_100k_135-104LAG-J01 -b CRAMPS
+loadusr -Wn Therm hal_temp_bbb -n Therm -c 04:epcos_B57560G1104,05:epcos_B57560G1104,06:epcos_B57560G1104 -b CRAMPS
 
 # ################################################
 # THREADS
