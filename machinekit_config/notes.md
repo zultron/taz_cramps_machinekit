@@ -238,9 +238,31 @@ From [flexydually OHAI][fd-ohai]:
   - Toggle machine power button in Axis; verify `STATUS` LED lights
     with power on
 - Test bed and extruder heater FETs:
-  - Run `halcmd setp hpg.pwmgen.00.out.*.value 1.0`, where `*` is
-    `00`, `01` or `02` for bed, E0 or E1, respectively
-  - Verify voltage at output
-  - Run `halcmd setp hpg.pwmgen.00.out.*.value 0.0`
-  - Verify 0V at output
+  - Machine power must be on in Axis
+  - Run `halcmd show signal | grep '*.\(temp\|heater\)'`, where `*` is
+    `e0`, `e1` or `bed`
+  - For E1, run `halcmd sets e1.ini.enable 1`
+  - Choose a value much lower than `*.temp.meas`, e.g. -500, and set
+    the PID with `halcmd sets *.temp.set -500`
+  - Re-run the above `halcmd show signal` command, and verify that the
+    `*.heater` signal is 0
+  - Verify 24VDC voltage at FET connector `-` terminal
+  - Verify FET LED is off
+  - Choose a value much higher than `*.temp.meas`, e.g. 500, and set
+    the PID with `halcmd sets *.temp.set 500`
+  - Re-run the above `halcmd show signal` command, and verify that the
+    `*.heater` signal is a positive number
+  - Verify 0VDC voltage at FET connector `-` terminal
+  - Verify FET LED is on
+  - For safety, reset the PID with `halcmd sets *.temp.set 0` after
+    testing an individual FET, and `halcmd sets e1.ini.enable 0` after
+    testing the E1 FET
 - Test bed and extruder heater thermistors: FIXME
+- Test extruder fan:
+  - Machine power must be on in Axis
+  - Run `halcmd sets fan.speed.set 0`
+  - Verify 24VDC voltage at E2 FET connector `-` terminal
+  - Verify E2 FET LED is off
+  - Run `halcmd sets fan.speed.set 255`
+  - Verify <24VDC voltage at E2 FET connector `-` terminal
+  - Verify E2 FET LED is on (perhaps pulsing)
