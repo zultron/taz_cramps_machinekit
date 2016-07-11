@@ -74,7 +74,16 @@ After testing:
   - `X_MAX_POS` 298; `Y_MAX_POS` 275; `Z_MAX_POS` 250
 - Good stuff about auto bed leveling
 - Homing speeds, mm/min:  50*60, 50*60, 8*60
-- Axis steps per unit:   100.5,100.5,1600,850
+- Axis steps per unit:   100.5,100.5,1600,850; all at 16 microsteps:
+  - X/Y gearing: belt is 2mm pitch; gear is 16 teeth; (200 steps/rev)
+    / (2mm/tooth * 16 teeth/rev) = 6.25 steps/mm; 1/16 microstepping?;
+    Shunts: 1=lo; 2=lo; 3=hi
+  - Z gearing: MTSBRK12-420-F7-R8-T9-Q8-S20-E5-FE0-FW7-FY1 screw is
+    2mm pitch; (200 steps/rev) / (2mm/rev) = 100 steps/mm; 1/16
+    microstepping; Shunts: 1=lo; 2=lo; 3=hi
+  - Extruder: M8 hobbed bolt; est. 7mm at hob; gears 9:47; (47/9) *
+    (200 steps/rev) / (22mm/rev) = 48 steps/mm; at 1/16 microstepping,
+    760 steps/mm; estimate looks reasonable
 - Max feedrate, mm/S:  800, 800, 8, 50
 - Max accel:  9000,9000,100,10000 "max start speed for accelerated moves"
 - Default accel:  500 mm/S^2 all joins max accel for printing moves
@@ -266,3 +275,7 @@ From [flexydually OHAI][fd-ohai]:
   - Run `halcmd sets fan.speed.set 255`
   - Verify <24VDC voltage at E2 FET connector `-` terminal
   - Verify E2 FET LED is on (perhaps pulsing)
+
+# Bring up
+- Set microstepping shunts
+- 
