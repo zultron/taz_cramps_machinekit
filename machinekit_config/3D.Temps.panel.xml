@@ -1,31 +1,52 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <pyvcp>
-<hbox>
-  <label>
-    <text>"Extruder Temp:"</text>
-  </label>
 
-  <number>
-    <halpin>"E0.Temp.set"</halpin>
-    <format>"3.1f"</format>
-  </number>
-</hbox>
+  <!-- ----------- E0 ----------- -->
+  <hbox>
+    <label>
+      <text>"Extruder 0 Temp:"</text>
+    </label>
+    <number>
+      <halpin>"e0.temp.set"</halpin>
+      <format>"3.1f"</format>
+    </number>
+  </hbox>
+
   <bar>
-    <halpin>"E0.Temp"</halpin>
+    <halpin>"e0.temp.meas"</halpin>
     <max_>300</max_>
   </bar>
-<hbox>
-  <label>
-    <text>"Bed Temp:"</text>
-  </label>
 
-  <number>
-    <halpin>"Bed.Temp.set"</halpin>
-    <format>"3.1f"</format>
-  </number>
-</hbox>
+  <!-- ----------- E1 ----------- -->
+  <hbox>
+    <label>
+      <text>"Extruder 1 Temp:"</text>
+    </label>
+    <number>
+      <halpin>"e1.temp.set"</halpin>
+      <format>"3.1f"</format>
+    </number>
+  </hbox>
+
+  <bar>
+    <halpin>"e1.temp.meas"</halpin>
+    <max_>300</max_>
+  </bar>
+
+  <!-- ----------- Bed ----------- -->
+  <hbox>
+    <label>
+      <text>"Bed Temp:"</text>
+    </label>
+    <number>
+      <halpin>"Bed.Temp.set"</halpin>
+      <format>"3.1f"</format>
+    </number>
+  </hbox>
+
   <bar>
     <halpin>"Bed.Temp"</halpin>
     <max_>300</max_>
   </bar>
+
 </pyvcp>
