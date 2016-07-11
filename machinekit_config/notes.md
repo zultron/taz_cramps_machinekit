@@ -278,4 +278,7 @@ From [flexydually OHAI][fd-ohai]:
 
 # Bring up
 - Set microstepping shunts
-- 
+
+# Machineface
+- Daren's [configs][ds-mcodes]; see `Arcus-3D-M1.qbs`, `launcher.ini`,
+  `run.py`, `storage.ini`
