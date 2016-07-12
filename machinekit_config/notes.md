@@ -277,7 +277,24 @@ From [flexydually OHAI][fd-ohai]:
   - Verify E2 FET LED is on (perhaps pulsing)
 
 # Bring up
-- Set microstepping shunts
+- Set microstepping shunts to 16V for each motor:
+  - For DRV8825, shunts 1 and 2 should be off; shunt 3 should be on
+- Set Pololu current limit trimpot
+  - Disconnect motors and power up controller
+  - Measure Vref at driver current limit trim pot
+  - Adjust trim pot according to driver and motor rated current
+    - Example motor current ratings:
+      - Stock TAZ SY42STH47-1504A motors [rated 1.5A][taz-motor-ds]
+	  - 17HS16-2004S1 motors rated 2A
+    - Determine how to set Vref for your driver
+	  - [DRV8825][pololu-drv8825]:  current = 2 * Vref; Vref = 0.75V
+        for stock TAZ motors
+    - Set current; [helpful video][pololu-trim-vid]
+      - Attach volt meter to screwdriver and adjust trim pot to Vref
+
+[taz-motor-ds]: https://download.lulzbot.com/AO-100/hardware/electronics/spec_sheets/SY42STH47-1504A_stepperMotors.pdf
+[pololu-trim-vid]: https://www.youtube.com/watch?v=89BHS9hfSUk
+[pololu-drv8825]: https://www.pololu.com/product/2133
 
 # Machineface
 - Daren's [configs][ds-mcodes]; see `Arcus-3D-M1.qbs`, `launcher.ini`,
